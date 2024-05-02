@@ -51,3 +51,9 @@ jobs:
       - name: Run mypy
         run: |
           poetry run mypy .
+
+      - name: Run Test
+        run: |
+          poetry run coverage run manage.py test
+          poetry run coverage report -m
+          poetry run coverage html
