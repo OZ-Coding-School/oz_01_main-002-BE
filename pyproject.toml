@@ -8,6 +8,8 @@ readme = "README.md"
 [tool.poetry.dependencies]
 python = "^3.12"
 django = "^5.0.4"
+coverage = "^7.5.0"
+pytest = "^8.2.0"
 
 
 [tool.poetry.group.dev.dependencies]
