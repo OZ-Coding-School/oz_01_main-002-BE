@@ -22,3 +22,5 @@ poetry run coverage report -m
 poetry run coverage html
 
 echo "${COLOR_GREEN}All tests passed successfully!${COLOR_NC}"
+
+
