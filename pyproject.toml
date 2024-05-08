@@ -1,0 +1,48 @@
+[tool.poetry]
+name = "mainproject"
+version = "0.1.0"
+description = ""
+authors = ["Samiiz <skboss159@gmail.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.12"
+fastapi = "^0.111.0"
+uvicorn = "^0.29.0"
+gunicorn = "^22.0.0"
+pydantic = "^2.7.1"
+pydantic-settings = "^2.2.1"
+tortoise-orm = {extras = ["asyncmy"], version = "^0.20.1"}
+aerich = "^0.7.2"
+cryptography = "^42.0.7"
+httpx = "^0.27.0"
+
+
+[tool.poetry.group.dev.dependencies]
+black = "^24.4.2"
+isort = "^5.13.2"
+mypy = "^1.10.0"
+coverage = "^7.5.1"
+pytest = "^8.2.0"
+pytest-asyncio = "^0.23.6"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.mypy]
+python_version = 3.12
+strict = true
+plugins = [
+    "pydantic.mypy"
+]
+
+[[tool.mypy.overrides]]
+module = "migrations.models.*"
+ignore_errors = true
+
+[tool.black]
+line-length = 120
+
+[tool.isort]
+profile = "black"
