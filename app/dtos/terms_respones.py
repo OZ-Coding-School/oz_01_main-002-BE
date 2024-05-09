@@ -2,7 +2,7 @@ from pydantic import BaseModel
 
 
 class TermsResponse(BaseModel):
-    id: str
+    id: int
     name: str
     content: str
     is_required: bool
