@@ -20,7 +20,7 @@ class Terms(Common, Model):
         return await cls.all()
 
     @classmethod
-    async def create_by_terms(cls, id: str, name: str, content: str) -> Terms:
+    async def create_by_terms(cls, id: int, name: str, content: str) -> Terms:
         return await cls.create(
             id=id,
             name=name,
