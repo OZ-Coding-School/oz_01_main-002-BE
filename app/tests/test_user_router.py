@@ -2,13 +2,7 @@ from unittest.mock import MagicMock, patch
 
 from tortoise.contrib.test import TestCase
 
-from app.services.user_service import (
-    generate_verification_code,
-    send_verification_email,
-)
-
-GMAIL_USERNAME: str = "its.verified.test@gmail.com"
-GMAIL_PASSWORD: str = "goxvdsfjrovuyqzv"
+from app.services.user_service import generate_verification_code
 
 
 class TestEmailVerification(TestCase):

@@ -1,7 +1,8 @@
-import uuid
 import smtplib
+import uuid
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
+
 from app.dtos.user_response import SendVerificationCodeResponse
 
 GMAIL_USERNAME: str = "its.verified.test@gmail.com"
