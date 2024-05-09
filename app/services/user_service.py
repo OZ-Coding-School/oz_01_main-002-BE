@@ -21,7 +21,7 @@ def send_verification_email(request_data: SendVerificationCodeResponse) -> dict[
         email_content = f"""
         안녕하세요 {request_data.name}님! 우리동네 경매장 입니다!
         
-        본 이메일은 저희 서비스를 사용하기 위한 필수 사항입니다.
+        본 이메일은 자사 서비스를 사용하기 위한 필수 사항입니다.
         
         아래의 코드는 절대 타인에게 노출되지 않도록 주의 바랍니다.
         
@@ -31,7 +31,7 @@ def send_verification_email(request_data: SendVerificationCodeResponse) -> dict[
         
         감사합니다.
         
-        우리동데 경매장
+        우리동네 경매장
         """
         msg = MIMEMultipart()
         msg["From"] = GMAIL_USERNAME
