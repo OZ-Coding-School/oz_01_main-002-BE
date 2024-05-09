@@ -1,3 +1,4 @@
+import logging
 import smtplib
 import uuid
 from email.mime.multipart import MIMEMultipart
@@ -51,4 +52,5 @@ def send_verification_email(request_data: SendVerificationCodeResponse) -> dict[
         return {"message": "Successfully sent the verification code to user email"}
 
     except Exception as e:
-        raise e
+        logging.error(f"An error occurred while sending verification email: {e}")
+        return {"error": str(e)}
