@@ -8,6 +8,7 @@ TORTOISE_APP_MODELS = [
     "aerich.models",
     "app.models.terms",
     "app.models.products",
+    "app.models.users",
 ]
 
 TORTOISE_ORM = {
