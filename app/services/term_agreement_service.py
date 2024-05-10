@@ -6,12 +6,12 @@ from app.dtos.terms_agreement_respones import (
     TermsAgreementResponseOut,
 )
 from app.models.terms import Terms
-from app.models.terms_agreements import Terms_Agreement
+from app.models.terms_agreements import TermsAgreement
 from app.models.users import User
 
 
 async def service_get_all_by_terms_agreement() -> list[TermsAgreementResponseIn]:
-    terms_agreement = await Terms_Agreement.get_all_by_terms_agreement()
+    terms_agreement = await TermsAgreement.get_all_by_terms_agreement()
     return [
         TermsAgreementResponseIn(
             id=terms_agreement.id,
@@ -34,7 +34,7 @@ async def service_create_terms_agreement(request_data: TermsAgreementResponseOut
     except DoesNotExist:
         raise HTTPException(status_code=404, detail="user 아이디 값이 없어여")
 
-    terms_agreement = await Terms_Agreement.create_by_terms_agreement(request_data)
+    terms_agreement = await TermsAgreement.create_by_terms_agreement(request_data)
 
     return TermsAgreementResponseOut(
         id=terms_agreement.id,

@@ -22,11 +22,11 @@ class TermsAgreement(Common, Model):
         table = "terms_agreements"
 
     @classmethod
-    async def get_all_by_terms_agreement(cls) -> list[Terms_Agreement]:
+    async def get_all_by_terms_agreement(cls) -> list[TermsAgreement]:
         return await cls.all()
 
     @classmethod
-    async def create_by_terms_agreement(cls, request_data: TermsAgreementResponseOut) -> Terms_Agreement:
+    async def create_by_terms_agreement(cls, request_data: TermsAgreementResponseOut) -> TermsAgreement:
         return await cls.create(
             user_id=request_data.user_id,
             term_id=request_data.term_id,
