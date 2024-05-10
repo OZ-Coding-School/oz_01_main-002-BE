@@ -9,7 +9,7 @@ from app.models.terms import Terms
 from app.models.users import User
 
 
-class Terms_Agreement(Common, Model):
+class TermsAgreement(Common, Model):
 
     user: fields.ForeignKeyRelation[User] = fields.ForeignKeyField(
         "models.User", related_name="terms_agreements", on_delete=fields.CASCADE
