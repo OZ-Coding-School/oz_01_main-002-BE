@@ -1,5 +1,6 @@
+import logging
+import random
 import smtplib
-import uuid
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 
@@ -10,10 +11,7 @@ GMAIL_PASSWORD: str = "goxvdsfjrovuyqzv"
 
 
 def generate_verification_code() -> int:
-    uuid_str = uuid.uuid4().hex  # UUID 생성
-    # 16진수 문자열을 10진수로 변환하여 6자리의 숫자로 제한
-    numeric_token = int(uuid_str, 16) % 900000 + 100000
-    return numeric_token
+    return int("".join(str(random.randint(0, 9)) for _ in range(6)))
 
 
 def send_verification_email(request_data: SendVerificationCodeResponse) -> dict[str, str]:
@@ -51,4 +49,5 @@ def send_verification_email(request_data: SendVerificationCodeResponse) -> dict[
         return {"message": "Successfully sent the verification code to user email"}
 
     except Exception as e:
-        raise e
+        logging.error(f"An error occurred while sending verification email: {e}")
+        return {"error": str(e)}
