@@ -18,18 +18,18 @@ class Inspection(Common, Model):
     inspection_count = fields.IntField(default=1)
 
     class Meta:
-        table = "inspection"
+        table = "inspections"
 
     @classmethod
     async def get_all_by_inspection(cls) -> list[Inspection]:
         return await cls.all()
 
     @classmethod
-    async def get_detail_by_inspection(cls, product_id: int) -> list[Inspection]:
+    async def get_by_inspection_detail(cls, product_id: int) -> list[Inspection]:
         return await cls.filter(product_id=product_id)
 
     @classmethod
-    async def get_one_by_inspection(cls, inspection_id: int) -> Inspection:
+    async def get_by_inspection_id(cls, inspection_id: int) -> Inspection:
         return await cls.get(id=inspection_id)
 
     @classmethod
@@ -43,7 +43,7 @@ class Inspection(Common, Model):
 
     @classmethod
     async def update_by_inspection(cls, inspection_id: int, request_data: InspectionUpdate) -> None:
-        inspection = await cls.get_one_by_inspection(inspection_id)
+        inspection = await cls.get_by_inspection_id(inspection_id)
         if inspection:
             inspection.inspector = request_data.inspector  # 수정할 검수자 지정
             inspection.inspection_count = request_data.inspection_count

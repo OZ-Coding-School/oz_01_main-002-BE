@@ -157,7 +157,7 @@ class TestInspectionRouter(TestCase):
         await service_update_inspection(inspection_id=created_inspection.id, request_data=updated_request_data)
 
         # 업데이트된 검사 조회
-        updated_inspection = await Inspection.get_one_by_inspection(inspection_id=created_inspection.id)
+        updated_inspection = await Inspection.get_by_inspection_id(inspection_id=created_inspection.id)
 
         self.assertEqual(updated_inspection.inspector, "로기")
         self.assertEqual(updated_inspection.inspection_count, 2)

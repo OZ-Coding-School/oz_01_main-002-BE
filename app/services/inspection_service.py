@@ -27,7 +27,7 @@ async def service_get_all_inspection() -> list[InspectionOut]:
 
 async def service_get_detail_inspection(product_id: int) -> list[InspectionOut]:
     try:
-        inspections = await Inspection.get_detail_by_inspection(product_id=product_id)
+        inspections = await Inspection.get_by_inspection_detail(product_id=product_id)
         if not inspections:
             raise HTTPException(status_code=404, detail="Inspections not found")
         return [
@@ -47,7 +47,7 @@ async def service_get_detail_inspection(product_id: int) -> list[InspectionOut]:
 
 async def service_get_one_inspection(inspection_id: int) -> InspectionOut:
     try:
-        inspection = await Inspection.get_one_by_inspection(inspection_id)
+        inspection = await Inspection.get_by_inspection_id(inspection_id)
         if inspection is None:
             raise HTTPException(status_code=404, detail="Inspection 아이디 값이 없습니다")
 
@@ -79,7 +79,7 @@ async def service_create_inspection(request_data: InspectionCreate) -> Inspectio
 
 async def service_update_inspection(inspection_id: int, request_data: InspectionUpdate) -> str:
     try:
-        await Inspection.get_one_by_inspection(inspection_id)
+        await Inspection.get_by_inspection_id(inspection_id)
     except DoesNotExist:
         raise HTTPException(status_code=404, detail="Inspection 아이디 값이 없습니다")
 
