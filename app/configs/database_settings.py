@@ -10,6 +10,7 @@ TORTOISE_APP_MODELS = [
     "app.models.products",
     "app.models.users",
     "app.models.inspections",
+    "app.models.terms_agreements",
 ]
 
 TORTOISE_ORM = {

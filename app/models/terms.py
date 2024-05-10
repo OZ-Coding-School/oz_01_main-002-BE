@@ -21,6 +21,10 @@ class Terms(Common, Model):
         return await cls.all()
 
     @classmethod
+    async def get_by_terms_id(cls, id: int) -> Terms:
+        return await cls.get(id=id)
+
+    @classmethod
     async def create_by_terms(cls, request_data: TermsResponseOut) -> Terms:
         return await cls.create(
             name=request_data.name,

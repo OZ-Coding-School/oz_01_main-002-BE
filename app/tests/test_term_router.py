@@ -5,7 +5,7 @@ from app.models.terms import Terms
 from app.services.term_service import service_create_term, service_get_all_by_terms
 
 
-class TestArticleRouter(TestCase):
+class TestTermRouter(TestCase):
     async def test_create_term(self) -> None:
         # given
         request_data = TermsResponseOut(name="이용", content="약관")
