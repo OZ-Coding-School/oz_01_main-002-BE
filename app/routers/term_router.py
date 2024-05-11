@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Request
+from fastapi import APIRouter
 
 from app.dtos.terms_respones import TermsResponseIn, TermsResponseOut
 from app.services.term_service import service_create_term, service_get_all_by_terms

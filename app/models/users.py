@@ -24,7 +24,7 @@ class User(Common, Model):
         return await cls.all()
 
     @classmethod
-    async def get_by_user_id(cls, id: str) -> User:
+    async def get_by_user_id(cls, id: int) -> User:
         return await cls.get(id=id)
 
     @classmethod
