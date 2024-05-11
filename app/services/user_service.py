@@ -4,17 +4,17 @@ import smtplib
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 
+from app.configs import settings
 from app.dtos.user_response import SendVerificationCodeResponse
-
-GMAIL_USERNAME: str = "its.verified.test@gmail.com"
-GMAIL_PASSWORD: str = "goxvdsfjrovuyqzv"
+from app.utils.redis_ import redis
+import orjson
 
 
 def generate_verification_code() -> int:
     return int("".join(str(random.randint(0, 9)) for _ in range(6)))
 
 
-def send_verification_email(request_data: SendVerificationCodeResponse) -> dict[str, str]:
+async def send_verification_email(request_data: SendVerificationCodeResponse) -> dict[str, str]:
     try:
         verification_code = generate_verification_code()
         email_content = f"""
@@ -33,7 +33,7 @@ def send_verification_email(request_data: SendVerificationCodeResponse) -> dict[
         우리동네 경매장
         """
         msg = MIMEMultipart()
-        msg["From"] = GMAIL_USERNAME
+        msg["From"] = settings.GMAIL_USERNAME
         msg["To"] = request_data.email
         msg["Subject"] = "우리동네 경매장 이메일 인증코드"
 
@@ -41,9 +41,20 @@ def send_verification_email(request_data: SendVerificationCodeResponse) -> dict[
 
         server = smtplib.SMTP_SSL("smtp.gmail.com", 465)
         server.ehlo()
-        server.login(GMAIL_USERNAME, GMAIL_PASSWORD)
+        server.login(settings.GMAIL_USERNAME, settings.GMAIL_PASSWORD)
 
-        server.sendmail(GMAIL_USERNAME, request_data.email, msg.as_string())
+        code = redis.get(request_data.email)['code']
+
+        if code is None:
+            await redis.set(request_data.email, orjson.dumps({"email": request_data.email, "code": verification_code}))
+            await redis.expire(request_data.email, 60)
+
+        elif len(code) == 6:
+            await redis.delete(request_data.email)
+            await redis.set(request_data.email, orjson.dumps({"email": request_data.email, "code": verification_code}))
+            await redis.expire(request_data.email, 60)
+
+        server.sendmail(settings.GMAIL_USERNAME, request_data.email, msg.as_string())
         server.close()
 
         return {"message": "Successfully sent the verification code to user email"}
