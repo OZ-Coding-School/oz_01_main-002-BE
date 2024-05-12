@@ -4,10 +4,13 @@ import smtplib
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 
-from app.configs import settings
-from app.dtos.user_response import SendVerificationCodeResponse
-from app.utils.redis_ import redis
 import orjson
+from fastapi import HTTPException
+from tortoise.exceptions import DoesNotExist
+
+from app.configs import settings
+from app.dtos.user_response import SendVerificationCodeResponse, VerifyEmailResponse
+from app.utils.redis_ import redis
 
 
 def generate_verification_code() -> int:
@@ -43,16 +46,22 @@ async def send_verification_email(request_data: SendVerificationCodeResponse) ->
         server.ehlo()
         server.login(settings.GMAIL_USERNAME, settings.GMAIL_PASSWORD)
 
-        code = redis.get(request_data.email)['code']
+        result = await redis.get(request_data.email)
 
-        if code is None:
-            await redis.set(request_data.email, orjson.dumps({"email": request_data.email, "code": verification_code}))
+        if result is None:
+            await redis.set(
+                request_data.email, orjson.dumps({"email": request_data.email, "code": str(verification_code)})
+            )
             await redis.expire(request_data.email, 60)
+        else:
+            code = orjson.loads(result)["code"]
 
-        elif len(code) == 6:
-            await redis.delete(request_data.email)
-            await redis.set(request_data.email, orjson.dumps({"email": request_data.email, "code": verification_code}))
-            await redis.expire(request_data.email, 60)
+            if len(code) == 6:
+                await redis.delete(request_data.email)
+                await redis.set(
+                    request_data.email, orjson.dumps({"email": request_data.email, "code": str(verification_code)})
+                )
+                await redis.expire(request_data.email, 60)
 
         server.sendmail(settings.GMAIL_USERNAME, request_data.email, msg.as_string())
         server.close()
@@ -62,3 +71,19 @@ async def send_verification_email(request_data: SendVerificationCodeResponse) ->
     except Exception as e:
         logging.error(f"An error occurred while sending verification email: {e}")
         return {"error": str(e)}
+
+
+async def service_code_authentication(request_data: VerifyEmailResponse) -> None:
+    try:
+        email = await redis.get(request_data.email)
+        if email is None:
+            raise HTTPException(status_code=400, detail="Bad Request - Incorrect Email")
+
+        elif request_data.email == orjson.loads(email)["email"]:
+            if str(request_data.code) == orjson.loads(await redis.get(request_data.email))["code"]:
+                await redis.delete(request_data.email)
+                raise HTTPException(status_code=200, detail="OK")
+        raise HTTPException(status_code=400, detail="Bad Request - Incorrect Code")
+
+    except DoesNotExist:
+        raise HTTPException(status_code=400, detail="Bad Request - Check user email as the authentication email ")
