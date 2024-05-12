@@ -30,3 +30,5 @@ archive.zip
 # macOS
 .DS_Store
 migrations
+
+dump.rdb
