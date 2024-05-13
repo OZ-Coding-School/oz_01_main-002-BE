@@ -9,8 +9,12 @@ class TestCategoryRouter(TestCase):
 
     async def test_create_category(self) -> None:
         async with AsyncClient(app=app, base_url="http://test") as ac:
-            response = await ac.post("categories/", json={"item_id": 2, "parent_id": 0, "sqe": 2, "name": "카테고리"})
-            response2 = await ac.post("categories/", json={"item_id": 2, "parent_id": 0, "sqe": 2, "name": "카테고리"})
+            response = await ac.post(
+                "/api/v1/categories/", json={"item_id": 2, "parent_id": 0, "sqe": 2, "name": "카테고리"}
+            )
+            response2 = await ac.post(
+                "/api/v1/categories/", json={"item_id": 2, "parent_id": 0, "sqe": 2, "name": "카테고리"}
+            )
         assert response.status_code == 201
         assert response2.status_code == 409
 
@@ -22,7 +26,7 @@ class TestCategoryRouter(TestCase):
         await Category.create(item_id=1003, parent_id=1, sqe=3, name="나는 신발")
 
         async with AsyncClient(app=app, base_url="http://test") as ac:
-            response = await ac.get("categories/")
+            response = await ac.get("/api/v1/categories/")
 
         assert response.status_code == 200
 
@@ -54,10 +58,10 @@ class TestCategoryRouter(TestCase):
         await Category.create(item_id=1003, parent_id=1, sqe=3, name="이것은 신발")
 
         async with AsyncClient(app=app, base_url="http://test") as ac:
-            response = await ac.get("categories/1")
-            response2 = await ac.get("categories/1001")
-            response3 = await ac.get("categories/1002")
-            response4 = await ac.get("categories/1003")
+            response = await ac.get("/api/v1/categories/1")
+            response2 = await ac.get("/api/v1/categories/1001")
+            response3 = await ac.get("/api/v1/categories/1002")
+            response4 = await ac.get("/api/v1/categories/1003")
 
         assert response.status_code == 200
         assert response2.status_code == 200
@@ -108,13 +112,13 @@ class TestCategoryRouter(TestCase):
         await Category.create(item_id=3003, parent_id=2007, sqe=3, name="에어포스")
 
         async with AsyncClient(app=app, base_url="http://test") as ac:
-            response1 = await ac.get("categories/parent_id/0")
-            response2 = await ac.get("categories/parent_id/1")
-            response3 = await ac.get("categories/parent_id/1001")
-            response4 = await ac.get("categories/parent_id/1002")
-            response5 = await ac.get("categories/parent_id/1003")
-            response6 = await ac.get("categories/parent_id/2007")
-            response7 = await ac.get("categories/parent_id/2008")
+            response1 = await ac.get("/api/v1/categories/parent_id/0")
+            response2 = await ac.get("/api/v1/categories/parent_id/1")
+            response3 = await ac.get("/api/v1/categories/parent_id/1001")
+            response4 = await ac.get("/api/v1/categories/parent_id/1002")
+            response5 = await ac.get("/api/v1/categories/parent_id/1003")
+            response6 = await ac.get("/api/v1/categories/parent_id/2007")
+            response7 = await ac.get("/api/v1/categories/parent_id/2008")
 
         assert response1.status_code == 200
         assert response2.status_code == 200
@@ -205,10 +209,10 @@ class TestCategoryRouter(TestCase):
         await Category.create(item_id=20002, parent_id=0, sqe=2, name="카테고리2")
 
         async with AsyncClient(app=app, base_url="http://test") as ac:
-            response = await ac.delete("categories/10001")
-            response1 = await ac.get("categories/10001")
-            response2 = await ac.get("categories/20002")
-            response3 = await ac.get("categories/")
+            response = await ac.delete("/api/v1/categories/10001")
+            response1 = await ac.get("/api/v1/categories/10001")
+            response2 = await ac.get("/api/v1/categories/20002")
+            response3 = await ac.get("/api/v1/categories/")
 
             assert response.status_code == 200
             assert response1.status_code == 404
