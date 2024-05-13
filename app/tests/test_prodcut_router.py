@@ -1,15 +1,10 @@
+from httpx import AsyncClient
 from tortoise.contrib.test import TestCase
 
-from app.dtos.product_response import ProductCreate, ProductUpdate
+from app import app
+from app.dtos.product_response import ProductCreate
 from app.models.products import Product
 from app.models.users import User
-from app.services.product_service import (
-    service_create_product,
-    service_delete_product,
-    service_get_all_products,
-    service_get_by_product_id,
-    service_update_product,
-)
 
 
 class TestProductRouter(TestCase):
@@ -27,209 +22,211 @@ class TestProductRouter(TestCase):
         )
 
     async def test_create_product(self) -> None:
-        test_user = await TestProductRouter.create_test_user()
+        async with AsyncClient(app=app, base_url="http://test") as ac:
+            test_user = await TestProductRouter.create_test_user()
 
-        product_data = ProductCreate(
-            name="test_product",
-            content="test content",
-            bid_price=1,
-            duration=1,
-            modify=False,
-            status="1",
-            grade="상",
-            category="test category",
-            user_id=test_user.id,
-        )
-        product = await service_create_product(product_data)
+            product_data = ProductCreate(
+                name="test_product",
+                content="test content",
+                bid_price=1,
+                duration=1,
+                modify=False,
+                status="1",
+                grade="상",
+                category="test category",
+                user_id=test_user.id,
+            )
+            response = await ac.post("/api/v1/products/", json=product_data.dict())
 
-        self.assertEqual(product.name, product_data.name)
-        self.assertEqual(product.content, product_data.content)
-        self.assertEqual(product.bid_price, product_data.bid_price)
-        self.assertEqual(product.duration, product_data.duration)
-        self.assertEqual(product.status, product_data.status)
-        self.assertEqual(product.grade, product_data.grade)
-        self.assertEqual(product.category, product_data.category)
+            assert response.status_code == 200
 
     async def test_get_all_products(self) -> None:
-        test_user = await TestProductRouter.create_test_user()
+        async with AsyncClient(app=app, base_url="http://test") as ac:
+            test_user = await TestProductRouter.create_test_user()
 
-        product_data1 = await Product.create(
-            name="test_product1",
-            content="test content",
-            bid_price=1,
-            duration=1,
-            modify=False,
-            status="1",
-            grade="상",
-            category="test category",
-            user_id=test_user.id,
-        )
-        product_data2 = await Product.create(
-            name="test_product2",
-            content="test content",
-            bid_price=2,
-            duration=2,
-            modify=False,
-            status="2",
-            grade="중",
-            category="test category",
-            user_id=test_user.id,
-        )
-        product_data3 = await Product.create(
-            name="test_product3",
-            content="test content",
-            bid_price=3,
-            duration=3,
-            modify=False,
-            status="3",
-            grade="하",
-            category="test category",
-            user_id=test_user.id,
-        )
-        product_data4 = await Product.create(
-            name="test_product4",
-            content="test content",
-            bid_price=4,
-            duration=4,
-            modify=False,
-            status="4",
-            grade="상",
-            category="test category",
-            user_id=test_user.id,
-        )
+            product_data1 = await Product.create(
+                name="test_product1",
+                content="test content",
+                bid_price=1,
+                duration=1,
+                modify=False,
+                status="1",
+                grade="상",
+                category="test category",
+                user_id=test_user.id,
+            )
+            product_data2 = await Product.create(
+                name="test_product2",
+                content="test content",
+                bid_price=2,
+                duration=2,
+                modify=False,
+                status="2",
+                grade="중",
+                category="test category",
+                user_id=test_user.id,
+            )
 
-        products = await service_get_all_products()
+            response = await ac.get("/api/v1/products/")
 
-        self.assertEqual(len(products), 4)
+            assert response.status_code == 200
+            response_data = response.json()
 
-        self.assertEqual(products[0].id, product_data1.id)
-        self.assertEqual(products[0].name, product_data1.name)
-        self.assertEqual(products[0].content, product_data1.content)
-        self.assertEqual(products[0].bid_price, product_data1.bid_price)
-        self.assertEqual(products[0].duration, product_data1.duration)
-        self.assertEqual(products[0].status, product_data1.status)
-        self.assertEqual(products[0].grade, product_data1.grade)
-        self.assertEqual(products[0].category, product_data1.category)
+            self.assertEqual(len(response_data), 2)
 
-        self.assertEqual(products[1].id, product_data2.id)
-        self.assertEqual(products[1].name, product_data2.name)
-        self.assertEqual(products[1].content, product_data2.content)
-        self.assertEqual(products[1].bid_price, product_data2.bid_price)
-        self.assertEqual(products[1].duration, product_data2.duration)
-        self.assertEqual(products[1].status, product_data2.status)
-        self.assertEqual(products[1].grade, product_data2.grade)
-        self.assertEqual(products[1].category, product_data2.category)
+            assert response_data[0]["id"] == product_data1.id
+            assert response_data[0]["name"] == product_data1.name
+            assert response_data[0]["content"] == product_data1.content
+            assert response_data[0]["bid_price"] == product_data1.bid_price
+            assert response_data[0]["duration"] == product_data1.duration
+            assert response_data[0]["status"] == product_data1.status
+            assert response_data[0]["grade"] == product_data1.grade
+            assert response_data[0]["category"] == product_data1.category
 
-        self.assertEqual(products[2].id, product_data3.id)
-        self.assertEqual(products[2].name, product_data3.name)
-        self.assertEqual(products[2].content, product_data3.content)
-        self.assertEqual(products[2].bid_price, product_data3.bid_price)
-        self.assertEqual(products[2].duration, product_data3.duration)
-        self.assertEqual(products[2].status, product_data3.status)
-        self.assertEqual(products[2].grade, product_data3.grade)
-        self.assertEqual(products[2].category, product_data3.category)
-
-        self.assertEqual(products[3].id, product_data4.id)
-        self.assertEqual(products[3].name, product_data4.name)
-        self.assertEqual(products[3].content, product_data4.content)
-        self.assertEqual(products[3].bid_price, product_data4.bid_price)
-        self.assertEqual(products[3].duration, product_data4.duration)
-        self.assertEqual(products[3].status, product_data4.status)
-        self.assertEqual(products[3].grade, product_data4.grade)
-        self.assertEqual(products[3].category, product_data4.category)
+            assert response_data[1]["id"] == product_data2.id
+            assert response_data[1]["name"] == product_data2.name
+            assert response_data[1]["content"] == product_data2.content
+            assert response_data[1]["bid_price"] == product_data2.bid_price
+            assert response_data[1]["duration"] == product_data2.duration
+            assert response_data[1]["status"] == product_data2.status
+            assert response_data[1]["grade"] == product_data2.grade
+            assert response_data[1]["category"] == product_data2.category
 
     async def test_get_product_id(self) -> None:
-        test_user = await TestProductRouter.create_test_user()
+        async with AsyncClient(app=app, base_url="http://test") as ac:
+            test_user = await TestProductRouter.create_test_user()
 
-        product_data1 = await Product.create(
-            id=1,
-            name="test_product",
-            content="test content",
-            bid_price=1,
-            duration=1,
-            modify=False,
-            status="1",
-            grade="상",
-            category="test category",
-            user_id=test_user.id,
-        )
+            product_data = await Product.create(
+                name="test_product1",
+                content="test content",
+                bid_price=1,
+                duration=1,
+                modify=False,
+                status="1",
+                grade="상",
+                category="test category",
+                user_id=test_user.id,
+            )
 
-        product1 = await service_get_by_product_id(id=product_data1.id)
+            response = await ac.get(f"/api/v1/products/{product_data.id}")
 
-        self.assertEqual(product1.id, product_data1.id)
-        self.assertEqual(product1.name, product_data1.name)
-        self.assertEqual(product1.content, product_data1.content)
-        self.assertEqual(product1.bid_price, product_data1.bid_price)
-        self.assertEqual(product1.duration, product_data1.duration)
-        self.assertEqual(product1.status, product_data1.status)
-        self.assertEqual(product1.grade, product_data1.grade)
-        self.assertEqual(product1.category, product_data1.category)
+            assert response.status_code == 200
+            response_data = response.json()
+
+            assert response_data["id"] == product_data.id
+            assert response_data["name"] == product_data.name
+            assert response_data["content"] == product_data.content
+            assert response_data["bid_price"] == product_data.bid_price
+            assert response_data["duration"] == product_data.duration
+            assert response_data["status"] == product_data.status
+            assert response_data["grade"] == product_data.grade
+            assert response_data["category"] == product_data.category
+
+    async def test_get_products_by_user_id(self) -> None:
+        async with AsyncClient(app=app, base_url="http://test") as ac:
+            test_user = await TestProductRouter.create_test_user()
+
+            product_data1 = await Product.create(
+                name="test_product1",
+                content="test content",
+                bid_price=1,
+                duration=1,
+                modify=False,
+                status="1",
+                grade="상",
+                category="test category",
+                user_id=test_user.id,
+            )
+            product_data2 = await Product.create(
+                name="test_product2",
+                content="test content",
+                bid_price=2,
+                duration=2,
+                modify=False,
+                status="2",
+                grade="중",
+                category="test category",
+                user_id=test_user.id,
+            )
+
+            response = await ac.get(f"/api/v1/products/user/{test_user.id}")
+
+            assert response.status_code == 200
+            response_data = response.json()
+
+            assert len(response_data) == 2
+
+            assert response_data[0]["id"] == product_data1.id
+            assert response_data[0]["name"] == product_data1.name
+            assert response_data[0]["content"] == product_data1.content
+            assert response_data[0]["bid_price"] == product_data1.bid_price
+            assert response_data[0]["duration"] == product_data1.duration
+            assert response_data[0]["status"] == product_data1.status
+            assert response_data[0]["grade"] == product_data1.grade
+            assert response_data[0]["category"] == product_data1.category
+
+            assert response_data[1]["id"] == product_data2.id
+            assert response_data[1]["name"] == product_data2.name
+            assert response_data[1]["content"] == product_data2.content
+            assert response_data[1]["bid_price"] == product_data2.bid_price
+            assert response_data[1]["duration"] == product_data2.duration
+            assert response_data[1]["status"] == product_data2.status
+            assert response_data[1]["grade"] == product_data2.grade
+            assert response_data[1]["category"] == product_data2.category
 
     async def test_update_product(self) -> None:
-        test_user = await TestProductRouter.create_test_user()
+        async with AsyncClient(app=app, base_url="http://test") as ac:
+            test_user = await TestProductRouter.create_test_user()
 
-        product_data1 = await Product.create(
-            id=1,
-            name="test_product",
-            content="test content",
-            bid_price=1,
-            duration=1,
-            modify=False,
-            status="1",
-            grade="상",
-            category="test category",
-            user_id=test_user.id,
-        )
+            product_data = await Product.create(
+                id=1,
+                name="test_product",
+                content="test content",
+                bid_price=1,
+                duration=1,
+                modify=False,
+                status="1",
+                grade="상",
+                category="test category",
+                user_id=test_user.id,
+            )
 
-        product = await service_get_by_product_id(id=product_data1.id)
+            update_product_data = {
+                "name": "new test product",
+                "content": "new test content",
+                "bid_price": 2,
+                "duration": 2,
+                "status": "2",
+                "user_id": test_user.id,
+            }
 
-        update_product_data = ProductUpdate(
-            name="new test product",
-            content="new test content",
-            bid_price=2,
-            duration=2,
-            status="2",
-        )
+            response = await ac.put(f"/api/v1/products/{product_data.id}", json=update_product_data)
 
-        await service_update_product(id=product.id, product_data=update_product_data)
+            assert response.status_code == 200
+            response_data = response.json()
 
-        update_product = await service_get_by_product_id(id=product_data1.id)
-        self.assertEqual(update_product.name, "new test product")
-        self.assertEqual(update_product.content, "new test content")
-        self.assertEqual(update_product.bid_price, 2)
-        self.assertEqual(update_product.duration, 2)
-        self.assertEqual(update_product.status, "2")
+            assert response_data["name"] == update_product_data["name"]
+            assert response_data["content"] == update_product_data["content"]
+            assert response_data["bid_price"] == update_product_data["bid_price"]
+            assert response_data["duration"] == update_product_data["duration"]
+            assert response_data["status"] == update_product_data["status"]
 
     async def test_delete_product(self) -> None:
-        test_user = await TestProductRouter.create_test_user()
+        async with AsyncClient(app=app, base_url="http://test") as ac:
+            test_user = await TestProductRouter.create_test_user()
 
-        await Product.create(
-            id=1,
-            name="test_product",
-            content="test content",
-            bid_price=1,
-            duration=1,
-            modify=False,
-            status="1",
-            grade="상",
-            category="test category",
-            user_id=test_user.id,
-        )
-        await Product.create(
-            id=2,
-            name="test_product",
-            content="test content",
-            bid_price=1,
-            duration=1,
-            modify=False,
-            status="1",
-            grade="상",
-            category="test category",
-            user_id=test_user.id,
-        )
+            product_data = await Product.create(
+                name="test_product",
+                content="test content",
+                bid_price=1,
+                duration=1,
+                modify=False,
+                status="1",
+                grade="상",
+                category="test category",
+                user_id=test_user.id,
+            )
 
-        await service_delete_product(id=1)
+            response = await ac.delete(f"/api/v1/products/{product_data.id}")
 
-        products = await service_get_all_products()
-
-        self.assertEqual(len(products), 1)
+            assert response.status_code == 200

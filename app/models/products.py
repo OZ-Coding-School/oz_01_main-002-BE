@@ -45,19 +45,25 @@ class Product(Common, Model):
         )
 
     @classmethod
-    async def get_by_product_id(cls, id: int) -> Product:
-        return await cls.get(id=id)
+    async def get_by_product_id(cls, product_id: int) -> Product:
+        return await cls.get(id=product_id)
 
     @classmethod
-    async def update_by_product_id(cls, id: int, product_data: ProductUpdate) -> None:
-        await cls.filter(id=id).update(
-            name=product_data.name,
-            content=product_data.content,
-            bid_price=product_data.bid_price,
-            duration=product_data.duration,
-            status=product_data.status,
-        )
+    async def get_by_user_id(cls, user_id: int) -> list[Product]:
+        return await cls.filter(user_id=user_id).all()
 
     @classmethod
-    async def delete_by_product_id(cls, id: int) -> None:
-        await cls.filter(id=id).delete()
+    async def update_by_product_id(cls, product_id: int, request_data: ProductUpdate) -> Product:
+        product = await cls.get(id=product_id)
+
+        update_data = request_data.dict(exclude_unset=True)
+
+        for key, value in update_data.items():
+            setattr(product, key, value)
+
+        await product.save()
+        return product
+
+    @classmethod
+    async def delete_by_product_id(cls, product_id: int) -> None:
+        await cls.filter(id=product_id).delete()
