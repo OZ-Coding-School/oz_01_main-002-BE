@@ -24,14 +24,14 @@ class User(Common, Model):
         return await cls.all()
 
     @classmethod
-    async def get_by_user_id(cls, id: int) -> User:
-        return await cls.get(id=id)
+    async def get_by_user_id(cls, user_id: int) -> User:
+        return await cls.get(id=user_id)
 
     @classmethod
     async def create_by_user(
         cls, name: str, email: str, password: str, gender: str, age: int, contact: str, nickname: str, content: str
-    ) -> User:
-        return await cls.create(
+    ) -> None:
+        await cls.create(
             name=name,
             email=email,
             password=password,
