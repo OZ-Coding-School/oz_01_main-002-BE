@@ -40,5 +40,5 @@ class Category(Model):
         await cls.filter(item_id=item_id).delete()
 
     @classmethod
-    async def get_categories_children(cls, parent_id: Optional[int] = None) -> list[Category]:
+    async def get_categories_children(cls, parent_id: int = None) -> list[Category]:
         return await cls.filter(parent_id=parent_id).order_by("sqe").all()

@@ -16,11 +16,6 @@ async def service_create_category(request_data: CategoryBaseResponse) -> Categor
             status_code=409,
             detail="Category already exists or item_id is not unique",
         )
-    except Exception as e:
-        raise HTTPException(
-            status_code=500,
-            detail=f"An unexpected error occurred: {str(e)}",
-        )
 
 
 async def service_get_all_categories() -> list[CategoryResponse]:
@@ -41,11 +36,6 @@ async def service_get_category_by_item_id(item_id: int) -> CategoryResponse:
         )
     except DoesNotExist:
         raise HTTPException(status_code=404, detail="Category not found")
-    except Exception as e:
-        raise HTTPException(
-            status_code=500,
-            detail=f"An unexpected error occurred: {str(e)}",
-        )
 
 
 async def service_get_categories_children(parent_id: int) -> list[CategoryResponse]:
@@ -63,21 +53,10 @@ async def service_get_categories_children(parent_id: int) -> list[CategoryRespon
         ]
     except DoesNotExist:
         raise HTTPException(status_code=404, detail="Categories not found")
-    except Exception as e:
-        raise HTTPException(
-            status_code=500,
-            detail=f"An unexpected error occurred: {str(e)}",
-        )
 
 
 async def service_delete_category(item_id: int) -> None:
     try:
-        category = await Category.get_by_category_item_id(item_id)
-        await category.delete()
+        await Category.delete_category(item_id)
     except DoesNotExist:
         raise HTTPException(status_code=404, detail="Category not found")
-    except Exception as e:
-        raise HTTPException(
-            status_code=500,
-            detail=f"An unexpected error occurred: {str(e)}",
-        )
