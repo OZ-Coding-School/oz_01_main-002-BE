@@ -14,5 +14,5 @@ class Settings(BaseSettings):
     DB_HOST: str = "127.0.0.1"
     DB_PORT: int = 3306
     DB_USER: str = "root"
-    DB_PASSWORD: str = ""
-    DB_DB: str = ""
+    DB_PASSWORD: str = "gudqls0516"
+    DB_DB: str = "fastapi_db"
