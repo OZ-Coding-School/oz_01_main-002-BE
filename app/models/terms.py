@@ -3,7 +3,7 @@ from __future__ import annotations
 from tortoise import fields
 from tortoise.models import Model
 
-from app.dtos.terms_respones import TermsResponseOut
+from app.dtos.terms_response import TermsResponseCreate
 from app.models.common import Common
 
 
@@ -25,7 +25,7 @@ class Terms(Common, Model):
         return await cls.get(id=id)
 
     @classmethod
-    async def create_by_terms(cls, request_data: TermsResponseOut) -> Terms:
+    async def create_by_terms(cls, request_data: TermsResponseCreate) -> Terms:
         return await cls.create(
             name=request_data.name,
             content=request_data.content,

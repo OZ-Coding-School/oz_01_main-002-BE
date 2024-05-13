@@ -1,19 +1,19 @@
 from fastapi import HTTPException
 from tortoise.exceptions import DoesNotExist
 
-from app.dtos.terms_agreement_respones import (
-    TermsAgreementResponseIn,
-    TermsAgreementResponseOut,
+from app.dtos.terms_agreement_response import (
+    TermsAgreementCreateResponse,
+    TermsAgreementGetResponse,
 )
 from app.models.terms import Terms
 from app.models.terms_agreements import TermsAgreement
 from app.models.users import User
 
 
-async def service_get_all_by_terms_agreement() -> list[TermsAgreementResponseIn]:
+async def service_get_all_by_terms_agreement() -> list[TermsAgreementGetResponse]:
     terms_agreement = await TermsAgreement.get_all_by_terms_agreement()
     return [
-        TermsAgreementResponseIn(
+        TermsAgreementGetResponse(
             id=terms_agreement.id,
             user_id=terms_agreement.user_id,  # type: ignore
             term_id=terms_agreement.term_id,  # type: ignore
@@ -24,7 +24,7 @@ async def service_get_all_by_terms_agreement() -> list[TermsAgreementResponseIn]
     ]
 
 
-async def service_create_terms_agreement(request_data: TermsAgreementResponseOut) -> TermsAgreementResponseOut:
+async def service_create_terms_agreement(request_data: TermsAgreementCreateResponse) -> TermsAgreementCreateResponse:
     try:
         await Terms.get_by_terms_id(id=request_data.term_id)
     except DoesNotExist:
@@ -36,10 +36,7 @@ async def service_create_terms_agreement(request_data: TermsAgreementResponseOut
 
     terms_agreement = await TermsAgreement.create_by_terms_agreement(request_data)
 
-    return TermsAgreementResponseOut(
-        id=terms_agreement.id,
+    return TermsAgreementCreateResponse(
         user_id=terms_agreement.user_id,  # type: ignore
         term_id=terms_agreement.term_id,  # type: ignore
-        created_at=terms_agreement.created_at,
-        updated_at=terms_agreement.updated_at,
     )

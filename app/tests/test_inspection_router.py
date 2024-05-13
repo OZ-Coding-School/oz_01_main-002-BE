@@ -1,7 +1,9 @@
 from tortoise.contrib.test import TestCase
 
-from app.dtos.inspection_respones import InspectionCreate, InspectionUpdate
-from app.dtos.product_response import ProductOut
+from app.dtos.inspection_response import (
+    InspectionCreateResponse,
+    InspectionUpdateResponse,
+)
 from app.models.inspections import Inspection
 from app.models.products import Product
 from app.models.users import User
@@ -54,8 +56,8 @@ class TestInspectionRouter(TestCase):
         )
 
         # 검사 요청 데이터 생성
-        request_data = InspectionCreate(inspector="유경록", product_id=product.id, inspection_count=1)
-        request_data1 = InspectionCreate(inspector="로기", product_id=product1.id, inspection_count=1)
+        request_data = InspectionCreateResponse(inspector="유경록", product_id=product.id, inspection_count=1)
+        request_data1 = InspectionCreateResponse(inspector="로기", product_id=product1.id, inspection_count=1)
 
         # 검사자 2개 생성
         await service_create_inspection(request_data=request_data)
@@ -138,7 +140,7 @@ class TestInspectionRouter(TestCase):
         )
 
         # 검사 요청 데이터 생성
-        request_data = InspectionCreate(inspector="유경록", product_id=product.id, inspection_count=1)
+        request_data = InspectionCreateResponse(inspector="유경록", product_id=product.id, inspection_count=1)
 
         # 검사 생성
         await service_create_inspection(request_data=request_data)
@@ -152,7 +154,9 @@ class TestInspectionRouter(TestCase):
         self.assertEqual(detail_inspections[0].product_id, product.id)
 
     async def test_router_create_inspection(self) -> None:
-        test_user = await User.create_by_user(
+
+        test_user = await User.create(
+            id=1,
             name="test_user",
             email="gudqls0516@naver.com",
             password="pw12345",
@@ -177,7 +181,7 @@ class TestInspectionRouter(TestCase):
         )
 
         # 검사 요청 데이터 생성
-        request_data = InspectionCreate(inspector="유경록", product_id=product.id, inspection_count=3)
+        request_data = InspectionCreateResponse(inspector="유경록", product_id=product.id, inspection_count=3)
 
         # 검사 생성
         created_inspection = await service_create_inspection(request_data=request_data)
@@ -187,7 +191,9 @@ class TestInspectionRouter(TestCase):
         self.assertEqual(created_inspection.inspection_count, 3)
 
     async def test_router_update_inspection(self) -> None:
-        test_user = await User.create_by_user(
+
+        test_user = await User.create(
+            id=1,
             name="test_user",
             email="gudqls0516@naver.com",
             password="pw12345",
@@ -215,7 +221,7 @@ class TestInspectionRouter(TestCase):
         created_inspection = await Inspection.create(inspector="유경록", product_id=product.id, inspection_count=3)
 
         # 새로운 업데이트 요청 데이터 생성
-        updated_request_data = InspectionUpdate(inspector="로기", inspection_count=2)
+        updated_request_data = InspectionUpdateResponse(inspector="로기", inspection_count=2)
 
         # 검사 업데이트
         await service_update_inspection(inspection_id=created_inspection.id, request_data=updated_request_data)

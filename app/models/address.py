@@ -51,7 +51,7 @@ class Address(Common, Model):
 
         # update_data에 있는 각 키와 값을 이용하여, 주소 정보를 업데이트
         for key, value in update_data.items():
-            setattr(address, key, value)  # 동적으로 address 객체의 속성을 업데이트
+            setattr(address, key, value)  # 객체의 속성을 업데이트
 
         await address.save()
         return address
