@@ -1,11 +1,11 @@
-from app.dtos.terms_respones import TermsResponseIn, TermsResponseOut
+from app.dtos.terms_response import TermsResponseCreate, TermsResponseGet
 from app.models.terms import Terms
 
 
-async def service_get_all_by_terms() -> list[TermsResponseIn]:
+async def service_get_all_by_terms() -> list[TermsResponseGet]:
     terms = await Terms.get_all_by_terms()
     return [
-        TermsResponseIn(
+        TermsResponseGet(
             id=term.id,
             name=term.name,
             content=term.content,
@@ -18,9 +18,9 @@ async def service_get_all_by_terms() -> list[TermsResponseIn]:
     ]
 
 
-async def service_create_term(request_data: TermsResponseOut) -> TermsResponseOut:
+async def service_create_term(request_data: TermsResponseCreate) -> TermsResponseCreate:
     term = await Terms.create_by_terms(request_data)
-    return TermsResponseOut(
+    return TermsResponseCreate(
         name=term.name,
         content=term.content,
     )

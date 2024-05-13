@@ -1,6 +1,7 @@
 from fastapi import FastAPI
 
 from app.configs.database_settings import initialize
+from app.routers.address_router import router as address_router
 from app.routers.inspector_router import router as inspector_router
 from app.routers.product_router import router as product_router
 from app.routers.term_agreement_router import router as term_agreement_router
@@ -13,4 +14,5 @@ app.include_router(term_router)
 app.include_router(user_router)
 app.include_router(inspector_router)
 app.include_router(term_agreement_router)
+app.include_router(address_router)
 initialize(app)

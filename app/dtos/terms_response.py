@@ -8,7 +8,7 @@ class BaseTermResponse(BaseModel):
     content: str
 
 
-class TermsResponseIn(BaseTermResponse):
+class TermsResponseGet(BaseTermResponse):
     id: int
     is_required: bool
     is_active: bool
@@ -16,5 +16,5 @@ class TermsResponseIn(BaseTermResponse):
     updated_at: datetime
 
 
-class TermsResponseOut(BaseTermResponse):
+class TermsResponseCreate(BaseTermResponse):
     pass

@@ -4,7 +4,7 @@ from fastapi import HTTPException
 from tortoise.contrib.test import TestCase
 from tortoise.exceptions import DoesNotExist
 
-from app.dtos.terms_agreement_respones import TermsAgreementResponseOut
+from app.dtos.terms_agreement_response import TermsAgreementCreateResponse
 from app.models.terms import Terms
 from app.models.users import User
 from app.services.term_agreement_service import (
@@ -38,7 +38,7 @@ class TestTermAgreementRouter(TestCase):
             contact="0120312",
         )
 
-        request_data = TermsAgreementResponseOut(
+        request_data = TermsAgreementCreateResponse(
             user_id=user.id,
             term_id=term.id,
         )
@@ -74,7 +74,7 @@ class TestTermAgreementRouter(TestCase):
         )
         # Terms.get_by_terms_id가 DoesNotExist 예외를 발생시키도록 모의 설정
         with patch("app.models.terms.Terms.get_by_terms_id", side_effect=DoesNotExist):
-            request_data = TermsAgreementResponseOut(
+            request_data = TermsAgreementCreateResponse(
                 user_id=1,
                 term_id=1,
             )
@@ -87,7 +87,7 @@ class TestTermAgreementRouter(TestCase):
             self.assertIn("term 아이디 값이 없어여", context.exception.detail)
 
         with patch("app.models.users.User.get_by_user_id", side_effect=DoesNotExist):
-            request_data = TermsAgreementResponseOut(
+            request_data = TermsAgreementCreateResponse(
                 user_id=1,
                 term_id=1,
             )
@@ -104,6 +104,6 @@ class TestTermAgreementRouter(TestCase):
 
         # then
         # 반환된 값이 예상 값과 일치하는지 확인
-        self.assertIsInstance(agreement, TermsAgreementResponseOut)
+        self.assertIsInstance(agreement, TermsAgreementCreateResponse)
         self.assertEqual(agreement.user_id, 1)
         self.assertEqual(agreement.term_id, 1)

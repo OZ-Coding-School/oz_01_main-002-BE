@@ -1,11 +1,13 @@
 from __future__ import annotations
 
-from typing import Optional
-
+from fastapi import HTTPException
 from tortoise import fields
 from tortoise.models import Model
 
-from app.dtos.inspection_respones import InspectionCreate, InspectionUpdate
+from app.dtos.inspection_response import (
+    InspectionCreateResponse,
+    InspectionUpdateResponse,
+)
 from app.models.common import Common
 from app.models.products import Product
 
@@ -33,7 +35,7 @@ class Inspection(Common, Model):
         return await cls.get(id=inspection_id)
 
     @classmethod
-    async def create_by_inspection(cls, request_data: InspectionCreate) -> Inspection:
+    async def create_by_inspection(cls, request_data: InspectionCreateResponse) -> Inspection:
 
         return await cls.create(
             inspector=request_data.inspector,
@@ -42,9 +44,9 @@ class Inspection(Common, Model):
         )
 
     @classmethod
-    async def update_by_inspection(cls, inspection_id: int, request_data: InspectionUpdate) -> None:
+    async def update_by_inspection(cls, inspection_id: int, request_data: InspectionUpdateResponse) -> Inspection:
         inspection = await cls.get_by_inspection_id(inspection_id)
-        if inspection:
-            inspection.inspector = request_data.inspector  # 수정할 검수자 지정
-            inspection.inspection_count = request_data.inspection_count
-            await inspection.save()
+        inspection.inspector = request_data.inspector  # 수정할 검수자 지정
+        inspection.inspection_count = request_data.inspection_count
+        await inspection.save()
+        return inspection
