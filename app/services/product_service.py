@@ -48,8 +48,8 @@ async def service_create_product(product_data: ProductCreate) -> ProductCreate:
     )
 
 
-async def service_get_by_product_id(id: int) -> ProductOut:
-    product = await Product.get_by_product_id(id)
+async def service_get_by_product_id(product_id: int) -> ProductOut:
+    product = await Product.get_by_product_id(product_id)
     if product:
         return ProductOut(
             id=product.id,
@@ -66,15 +66,37 @@ async def service_get_by_product_id(id: int) -> ProductOut:
     raise HTTPException(status_code=404, detail="Product not found")
 
 
-async def service_update_product(id: int, product_data: ProductUpdate) -> ProductUpdate:
+async def service_get_products_by_user_id(user_id: int) -> list[ProductOut]:
     try:
-        product = await Product.get_by_product_id(id)
+        await User.get_by_user_id(id=user_id)
+    except DoesNotExist:
+        raise HTTPException(status_code=404, detail="User not found")
+
+    products = await Product.get_by_user_id(user_id)
+    return [
+        ProductOut(
+            id=product.id,
+            name=product.name,
+            content=product.content,
+            bid_price=product.bid_price,
+            duration=product.duration,
+            status=product.status,
+            modify=product.modify,
+            grade=product.grade,
+            category=product.category,
+            user_id=product.user_id,
+        )
+        for product in products
+    ]
+
+
+async def service_update_product(product_id: int, product_data: ProductUpdate) -> ProductUpdate:
+    try:
+        product = await Product.get_by_product_id(product_id)
     except DoesNotExist:
         raise HTTPException(status_code=404, detail="not found")
 
-    await Product.update_by_product_id(id, product_data)
-
-    new_product = await Product.get_by_product_id(id)
+    new_product = await Product.update_by_product_id(product_id, product_data)
 
     return ProductUpdate(
         name=new_product.name,
@@ -82,15 +104,12 @@ async def service_update_product(id: int, product_data: ProductUpdate) -> Produc
         bid_price=new_product.bid_price,
         duration=new_product.duration,
         status=new_product.status,
-        modify=product.modify,
-        grade=new_product.grade,
-        category=new_product.category,
     )
 
 
-async def service_delete_product(id: int) -> None:
+async def service_delete_product(product_id: int) -> None:
     try:
-        product = await Product.get_by_product_id(id)
+        product = await Product.get_by_product_id(product_id)
     except DoesNotExist:
         raise HTTPException(status_code=404, detail="not found")
 

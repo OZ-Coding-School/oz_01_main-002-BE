@@ -65,7 +65,7 @@ async def service_get_one_inspection(inspection_id: int) -> InspectionGetRespons
 
 async def service_create_inspection(request_data: InspectionCreateResponse) -> InspectionCreateResponse:
     try:
-        await Product.get_by_product_id(id=request_data.product_id)
+        await Product.get_by_product_id(product_id=request_data.product_id)
     except DoesNotExist:
         raise HTTPException(status_code=404, detail="Product 아이디 값이 없습니다")
     inspection = await Inspection.create_by_inspection(request_data)

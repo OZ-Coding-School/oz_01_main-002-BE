@@ -1,13 +1,15 @@
+from typing import Optional
+
 from pydantic import BaseModel
 
 
 class ProductBase(BaseModel):
-    name: str
-    content: str
-    bid_price: int
-    duration: int
+    name: Optional[str] = None
+    content: Optional[str] = None
+    bid_price: Optional[int] = None
+    duration: Optional[int] = None
     user_id: int
-    status: str
+    status: Optional[str] = None
     modify: bool
     grade: str
     category: str
@@ -18,11 +20,11 @@ class ProductCreate(ProductBase):
 
 
 class ProductUpdate(BaseModel):
-    name: str
-    content: str
-    bid_price: int
-    duration: int
-    status: str
+    name: Optional[str] = None
+    content: Optional[str] = None
+    bid_price: Optional[int] = None
+    duration: Optional[int] = None
+    status: Optional[str] = None
 
 
 class ProductOut(ProductBase):
