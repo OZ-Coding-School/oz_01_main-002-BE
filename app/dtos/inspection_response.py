@@ -9,16 +9,16 @@ class InspectionBase(BaseModel):
     inspection_count: int
 
 
-class InspectionCreate(InspectionBase):
+class InspectionCreateResponse(InspectionBase):
     pass
 
 
-class InspectionOut(InspectionBase):
+class InspectionGetResponse(InspectionBase):
     id: int
     created_at: datetime
     updated_at: datetime
 
 
-class InspectionUpdate(BaseModel):
+class InspectionUpdateResponse(BaseModel):
     inspector: str
     inspection_count: int

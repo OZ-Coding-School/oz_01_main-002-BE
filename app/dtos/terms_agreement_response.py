@@ -8,11 +8,11 @@ class BaseTermsAgreementResponse(BaseModel):
     user_id: int
 
 
-class TermsAgreementResponseIn(BaseTermsAgreementResponse):
+class TermsAgreementGetResponse(BaseTermsAgreementResponse):
     id: int
     created_at: datetime
     updated_at: datetime
 
 
-class TermsAgreementResponseOut(BaseTermsAgreementResponse):
+class TermsAgreementCreateResponse(BaseTermsAgreementResponse):
     pass
