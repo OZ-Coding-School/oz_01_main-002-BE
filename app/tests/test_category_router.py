@@ -214,13 +214,3 @@ class TestCategoryRouter(TestCase):
             assert response1.status_code == 404
             assert response2.status_code == 200
             assert response3.json()[0]["item_id"] == 20002
-
-    #
-    #     await service_create_category(CategoryBaseResponse(item_id=10001, parent_id=0, sqe=1, name="카테고리1"))
-    #     await service_create_category(CategoryBaseResponse(item_id=20002, parent_id=0, sqe=2, name="카테고리2"))
-    #
-    #     await service_delete_category(20002)
-    #
-    #     categories = await service_get_all_categories()
-    #
-    #     self.assertEqual(len(categories), 1)
