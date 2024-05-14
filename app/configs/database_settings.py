@@ -13,6 +13,7 @@ TORTOISE_APP_MODELS = [
     "app.models.terms_agreements",
     "app.models.address",
     "app.models.categories",
+    "app.models.chat",
 ]
 
 TORTOISE_ORM = {

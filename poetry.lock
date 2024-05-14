@@ -68,6 +68,20 @@ test = ["anyio[trio]", "coverage[toml] (>=7)", "exceptiongroup (>=1.2.0)", "hypo
 trio = ["trio (>=0.23)"]
 
 [[package]]
+name = "asyncio-redis"
+version = "0.16.0"
+description = "PEP 3156 implementation of the redis protocol."
+optional = false
+python-versions = ">=3.6"
+files = [
+    {file = "asyncio_redis-0.16.0-py2.py3-none-any.whl", hash = "sha256:4a134fde5ea3628ff0c7118e2424b0f26140a1bd21d5e4632058f1f662773686"},
+    {file = "asyncio_redis-0.16.0.tar.gz", hash = "sha256:ff8ce4e7e22a08e2688ae6b397aeac355473e343ce3c68ae3b713494318d848b"},
+]
+
+[package.extras]
+hiredis = ["hiredis"]
+
+[[package]]
 name = "asyncmy"
 version = "0.2.9"
 description = "A fast asyncio MySQL driver"
@@ -176,6 +190,22 @@ colorama = ["colorama (>=0.4.3)"]
 d = ["aiohttp (>=3.7.4)", "aiohttp (>=3.7.4,!=3.9.0)"]
 jupyter = ["ipython (>=7.8.0)", "tokenize-rt (>=3.2.0)"]
 uvloop = ["uvloop (>=0.15.2)"]
+
+[[package]]
+name = "broadcaster"
+version = "0.2.0"
+description = "Simple broadcast channels."
+optional = false
+python-versions = ">=3.7"
+files = [
+    {file = "broadcaster-0.2.0-py3-none-any.whl", hash = "sha256:50f93d1af7e9097a87ef3b2da269b4b4c5630ec080dc5c7f941ef314291937b1"},
+    {file = "broadcaster-0.2.0.tar.gz", hash = "sha256:72056f9b77b091dd4bbad4d7484bd0e6835c3443d4564d0bbf41190c29c606c6"},
+]
+
+[package.extras]
+kafka = ["aiokafka"]
+postgres = ["asyncpg"]
+redis = ["asyncio-redis"]
 
 [[package]]
 name = "certifi"
@@ -1687,4 +1717,4 @@ files = [
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.12"
-content-hash = "b14df9fa5a1578c2af27206ed87f75fbe9b1688eae059dcff1018d818d8c9fbb"
+content-hash = "e2d1b18ea8ef9ad59b03f4fdc0a6b31bdf65ab8120ba0a9d52de0f95da5fba03"
