@@ -31,7 +31,7 @@ async def service_get_all_products() -> list[ProductOut]:
 
 async def service_create_product(product_data: ProductCreate) -> ProductCreate:
     try:
-        await User.get_by_user_id(id=product_data.user_id)
+        await User.get_by_user_id(user_id=product_data.user_id)
     except DoesNotExist:
         raise HTTPException(status_code=404, detail="user_id not found")
 
@@ -69,7 +69,7 @@ async def service_get_by_product_id(product_id: int) -> ProductOut:
 
 async def service_get_products_by_user_id(user_id: int) -> list[ProductOut]:
     try:
-        await User.get_by_user_id(id=user_id)
+        await User.get_by_user_id(user_id=user_id)
     except DoesNotExist:
         raise HTTPException(status_code=404, detail="User not found")
 
