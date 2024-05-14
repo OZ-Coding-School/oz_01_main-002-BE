@@ -41,3 +41,7 @@ class User(Common, Model):
             nickname=nickname,
             content=content,
         )
+
+    @classmethod
+    async def get_by_user_nickname(cls, nickname: str) -> User:
+        return await cls.get(nickname=nickname)

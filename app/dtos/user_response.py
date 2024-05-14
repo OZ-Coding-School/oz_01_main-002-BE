@@ -20,3 +20,7 @@ class SendVerificationCodeResponse(BaseModel):
 class VerifyEmailResponse(BaseModel):
     email: str
     code: int
+
+
+class VerifyNicknameResponse(BaseModel):
+    nickname: str

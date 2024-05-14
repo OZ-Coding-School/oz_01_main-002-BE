@@ -110,3 +110,17 @@ async def service_code_authentication(request_data: VerifyEmailResponse) -> None
 
     except DoesNotExist:
         raise HTTPException(status_code=400, detail="Bad Request - Check user email as the authentication email ")
+
+
+async def service_nickname_verification(request_data: VerifyNicknameResponse) -> None:
+    try:
+        if request_data.nickname.isdigit():
+            raise HTTPException(status_code=400, detail="Bad Request - Nickname must string")
+
+        user = await User.get_by_user_nickname(nickname=request_data.nickname)
+
+        if user.nickname == request_data.nickname:
+            raise HTTPException(status_code=400, detail="Bad Request - Nickname already registered")
+
+    except DoesNotExist:
+        raise HTTPException(status_code=200, detail="OK - Nickname available")
