@@ -1,5 +1,6 @@
 import logging
 import random
+import re
 import smtplib
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
@@ -9,8 +10,18 @@ from fastapi import HTTPException
 from tortoise.exceptions import DoesNotExist
 
 from app.configs import settings
-from app.dtos.user_response import SendVerificationCodeResponse, VerifyEmailResponse
+from app.dtos.user_response import (
+    SendVerificationCodeResponse,
+    VerifyEmailResponse,
+    VerifyNicknameResponse,
+)
+from app.models.users import User
 from app.utils.redis_ import redis
+
+
+def is_valid_email(email: str) -> bool:
+    pattern = r"^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$"
+    return re.match(pattern, email) is not None
 
 
 def generate_verification_code() -> int:
@@ -18,6 +29,18 @@ def generate_verification_code() -> int:
 
 
 async def send_verification_email(request_data: SendVerificationCodeResponse) -> dict[str, str]:
+    try:
+        if not is_valid_email(request_data.email):
+            raise HTTPException(status_code=400, detail="Invalid email")
+
+        user = await User.get(email=request_data.email)
+
+        if user.email == request_data.email:
+            raise HTTPException(status_code=400, detail="Email already registered")
+
+    except DoesNotExist:
+        pass
+
     try:
         verification_code = generate_verification_code()
         email_content = f"""
