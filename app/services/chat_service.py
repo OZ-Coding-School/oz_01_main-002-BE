@@ -33,7 +33,6 @@ async def service_register_user_to_room(body: RegisterToRoomResponse) -> dict[st
         user = await User.get_by_user_id(chat_message.user_id)
         # 채팅 메시지를 준비합니다.
         if user:
-            user_nickname = user.nickname
             message_to_send = f"{chat_message.message}"
 
         # 채팅방의 모든 사용자에게 메시지를 전송합니다.

@@ -35,7 +35,7 @@ class ConnectionManager:
         사용자의 WebSocket 연결 레코드를 저장합니다.
         """
         self.user_connections[user_id] = ws_connection
-        await self._send_message_to_ws_connection(message="연결 성공", ws_connection=ws_connection)
+        await self.send_message_to_ws_connection(message="연결 성공", ws_connection=ws_connection)
 
     async def add_user_connection_to_room(self, room_id: str, user_id: int) -> Tuple[bool, str]:
         """
@@ -46,7 +46,7 @@ class ConnectionManager:
         if user_ws_connection is None:
             return False, "사용자를 찾을 수 없습니다"
 
-        is_connection_active = await self._check_if_ws_connection_is_still_active(user_ws_connection)
+        is_connection_active = await self.check_if_ws_connection_is_still_active(user_ws_connection)
 
         if not is_connection_active:
             self.user_connections.pop(user_id)
@@ -64,7 +64,7 @@ class ConnectionManager:
 
         return True, "연결 성공"
 
-    async def _check_if_ws_connection_is_still_active(self, ws_connection: WebSocket, message: str = ".") -> bool:
+    async def check_if_ws_connection_is_still_active(self, ws_connection: WebSocket, message: str = ".") -> bool:
         """
         WebSocket 연결이 여전히 활성 상태인지 확인합니다.
         """
@@ -81,7 +81,7 @@ class ConnectionManager:
 
         return True
 
-    async def _consume_events(self, message: MessageToRoomResponse) -> None:
+    async def consume_events(self, message: MessageToRoomResponse) -> None:
         """
         채널에서 메시지를 수신합니다.
         """
@@ -94,7 +94,7 @@ class ConnectionManager:
             users_ws_connections = [users_ws_connections]
 
         for connection in users_ws_connections:
-            is_sent, sent_message_response_info = await self._send_message_to_ws_connection(
+            is_sent, sent_message_response_info = await self.send_message_to_ws_connection(
                 message=f"방 {message.room_id} --> {message.message}", ws_connection=connection
             )
 
@@ -106,7 +106,7 @@ class ConnectionManager:
             async for event in subscriber:
                 # print(event.message)
                 message = MessageToRoomResponse.model_validate_json(event.message)
-                await self._consume_events(message=message)
+                await self.consume_events(message=message)
 
     async def send_message_to_room(self, room_id: str, message: str, user_nickname: str, user_id: int) -> None:
         """
@@ -121,9 +121,9 @@ class ConnectionManager:
             users_ws_connections = [users_ws_connections]
 
         for connection in users_ws_connections:
-            await self._send_message_to_ws_connection(message=f"{user_nickname}-->{message}", ws_connection=connection)
+            await self.send_message_to_ws_connection(message=f"{user_nickname}-->{message}", ws_connection=connection)
 
-    async def _send_message_to_ws_connection(self, message: str, ws_connection: WebSocket) -> Tuple[bool, str]:
+    async def send_message_to_ws_connection(self, message: str, ws_connection: WebSocket) -> Tuple[bool, str]:
         """
         WebSocket 연결에 메시지를 보냅니다.
         """

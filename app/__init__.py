@@ -18,7 +18,6 @@ app.add_middleware(
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
-    # exclude_routes=[r"/api/v1/chat/ws/{user_id}"]
 )
 app.include_router(product_router)
 app.include_router(term_router)
