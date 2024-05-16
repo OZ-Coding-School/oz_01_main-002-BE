@@ -7,21 +7,30 @@ from email.mime.text import MIMEText
 
 import orjson
 from fastapi import HTTPException
-from tortoise.exceptions import DoesNotExist
+from tortoise.exceptions import DoesNotExist, IntegrityError
 
 from app.configs import settings
+from app.dtos.terms_agreement_response import TermsAgreementCreateResponse
+from app.dtos.terms_response import TermIDResponse
 from app.dtos.user_response import (
     SendVerificationCodeResponse,
+    UserSignUpResponse,
     VerifyEmailResponse,
-    VerifyNicknameResponse,
+    VerifyNicknameResponse, VerifyContactResponse,
 )
 from app.models.users import User
+from app.services.term_agreement_service import service_create_terms_agreement
 from app.utils.redis_ import redis
 
 
 def is_valid_email(email: str) -> bool:
     pattern = r"^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$"
     return re.match(pattern, email) is not None
+
+
+def is_valid_contact(contact: str) -> bool:
+    pattern = r'^01[0-9]-\d{4}-\d{4}$'
+    return re.match(pattern, contact) is not None
 
 
 def generate_verification_code() -> int:
@@ -124,3 +133,47 @@ async def service_nickname_verification(request_data: VerifyNicknameResponse) ->
 
     except DoesNotExist:
         raise HTTPException(status_code=200, detail="OK - Nickname available")
+
+
+async def service_contact_verification(request_data: VerifyContactResponse) -> None:
+    try:
+        integer_contact = ",".join(request_data.contact.split("-"))
+        if not integer_contact.isdigit():
+            raise HTTPException(status_code=400, detail="Bad Request - Contact must integer without '-' ")
+
+        if not is_valid_contact(request_data.contact):
+            raise HTTPException(status_code=400, detail="Bad Request - Invalid Contact")
+
+        user = await User.get_by_user_contact(contact=request_data.contact)
+
+        if user.contact == request_data.contact:
+            raise HTTPException(status_code=400, detail="Bad Request - Contact already registered")
+
+    except DoesNotExist:
+        raise HTTPException(status_code=200, detail="OK - Contact available")
+
+
+async def service_signup(request_data: UserSignUpResponse, term_data: list[TermIDResponse]) -> None:
+    try:
+        await User.get(email=request_data.email)
+        raise HTTPException(status_code=400, detail="Bad Request - User already registered")
+
+    except DoesNotExist:
+        pass
+
+    try:
+        await User.create_by_user(request_data)
+
+        user = await User.get(email=request_data.email)
+
+        data = [term.id for term in term_data]
+
+        user_term_agreements = [TermsAgreementCreateResponse(user_id=user.id, term_id=term_id) for term_id in data]
+
+        for user_term_agreement in user_term_agreements:
+            await service_create_terms_agreement(user_term_agreement)
+
+        raise HTTPException(status_code=201, detail="Created - successfully signup!")
+
+    except IntegrityError:
+        raise HTTPException(status_code=400, detail="Bad Request - User already registered")

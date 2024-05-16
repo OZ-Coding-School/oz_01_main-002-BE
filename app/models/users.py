@@ -3,6 +3,7 @@ from __future__ import annotations
 from tortoise import fields
 from tortoise.models import Model
 
+from app.dtos.user_response import UserSignUpResponse
 from app.models.common import Common
 
 
@@ -12,9 +13,9 @@ class User(Common, Model):
     password = fields.CharField(max_length=50)
     gender = fields.CharField(max_length=6)
     age = fields.IntField(max_length=3)
-    contact = fields.CharField(max_length=15)
+    contact = fields.CharField(max_length=15, unique=True)
     nickname = fields.CharField(max_length=30, unique=True)
-    content = fields.TextField(null=True)
+    content = fields.TextField(default="나를 표현해주세요")
 
     class Meta:
         table = "users"
@@ -28,20 +29,21 @@ class User(Common, Model):
         return await cls.get(id=user_id)
 
     @classmethod
-    async def create_by_user(
-        cls, name: str, email: str, password: str, gender: str, age: int, contact: str, nickname: str, content: str
-    ) -> None:
+    async def create_by_user(cls, request_data: UserSignUpResponse) -> None:
         await cls.create(
-            name=name,
-            email=email,
-            password=password,
-            gender=gender,
-            age=age,
-            contact=contact,
-            nickname=nickname,
-            content=content,
+            name=request_data.name,
+            email=request_data.email,
+            password=request_data.password,
+            gender=request_data.gender,
+            age=request_data.age,
+            contact=request_data.contact,
+            nickname=request_data.nickname,
         )
 
     @classmethod
     async def get_by_user_nickname(cls, nickname: str) -> User:
         return await cls.get(nickname=nickname)
+
+    @classmethod
+    async def get_by_user_contact(cls, contact: str) -> User:
+        return await cls.get(contact=contact)
