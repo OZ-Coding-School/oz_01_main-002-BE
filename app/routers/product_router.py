@@ -6,6 +6,7 @@ from app.services.product_service import (
     service_delete_product,
     service_get_all_products,
     service_get_by_product_id,
+    service_get_products_by_category_id,
     service_get_products_by_user_id,
     service_update_product,
 )
@@ -31,6 +32,11 @@ async def router_get_product_id(product_id: int) -> ProductOut:
 @router.get("/user/{user_id}", response_model=list[ProductOut])
 async def router_get_products_by_user_id(user_id: int) -> list[ProductOut]:
     return await service_get_products_by_user_id(user_id)
+
+
+@router.get("/categories/{category_id}", response_model=list[ProductOut])
+async def router_get_products_by_item_id(category_id: int) -> list[ProductOut]:
+    return await service_get_products_by_category_id(category_id)
 
 
 @router.put("/{product_id}", response_model=ProductUpdate)
