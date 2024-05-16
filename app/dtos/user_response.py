@@ -1,3 +1,5 @@
+from typing import Optional
+
 from pydantic import BaseModel
 
 
@@ -7,9 +9,8 @@ class UserSignUpResponse(BaseModel):
     password: str
     gender: str
     age: int
-    contact: int
+    contact: str
     nickname: str
-    content: str
 
 
 class SendVerificationCodeResponse(BaseModel):
@@ -24,3 +25,7 @@ class VerifyEmailResponse(BaseModel):
 
 class VerifyNicknameResponse(BaseModel):
     nickname: str
+
+
+class VerifyContactResponse(BaseModel):
+    contact: str
