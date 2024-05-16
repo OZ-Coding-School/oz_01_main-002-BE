@@ -178,22 +178,6 @@ jupyter = ["ipython (>=7.8.0)", "tokenize-rt (>=3.2.0)"]
 uvloop = ["uvloop (>=0.15.2)"]
 
 [[package]]
-name = "broadcaster"
-version = "0.2.0"
-description = "Simple broadcast channels."
-optional = false
-python-versions = ">=3.7"
-files = [
-    {file = "broadcaster-0.2.0-py3-none-any.whl", hash = "sha256:50f93d1af7e9097a87ef3b2da269b4b4c5630ec080dc5c7f941ef314291937b1"},
-    {file = "broadcaster-0.2.0.tar.gz", hash = "sha256:72056f9b77b091dd4bbad4d7484bd0e6835c3443d4564d0bbf41190c29c606c6"},
-]
-
-[package.extras]
-kafka = ["aiokafka"]
-postgres = ["asyncpg"]
-redis = ["asyncio-redis"]
-
-[[package]]
 name = "certifi"
 version = "2024.2.2"
 description = "Python package for providing Mozilla's CA Bundle."
@@ -1718,4 +1702,4 @@ files = [
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.12"
-content-hash = "4e2ae75e2ee0ef81852e5d58359c042cbd127cd4bb7e31c0d66e7402fb69aa6e"
+content-hash = "38e55c5a4c57335808bb810125148cea7439a4063b7feb67556a3327bff9e2f9"
