@@ -7,17 +7,6 @@ from app.models.common import Common
 from app.models.users import User
 
 
-class RegisterToRoomModel(Common, Model):
-    user: fields.ForeignKeyRelation[User] = fields.ForeignKeyField(
-        "models.User", related_name="reister_to_rooms", on_delete=fields.CASCADE
-    )
-    user_id: int
-    room_id = fields.CharField(max_length=255)
-
-    class Meta:
-        table = "chatrooms"
-
-
 class MessageToRoomModel(Common, Model):
     user: fields.ForeignKeyRelation[User] = fields.ForeignKeyField(
         "models.User", related_name="message_to_rooms", on_delete=fields.CASCADE

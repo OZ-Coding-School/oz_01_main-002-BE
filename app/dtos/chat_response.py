@@ -1,12 +1,10 @@
 from pydantic import BaseModel
 
 
-class RegisterToRoomResponse(BaseModel):
+class MessageToRoomBaseResponse(BaseModel):
     user_id: int
     room_id: str
 
 
-class MessageToRoomResponse(BaseModel):
-    user_id: int
+class MessageToRoomResponse(MessageToRoomBaseResponse):
     message: str
-    room_id: str

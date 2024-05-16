@@ -47,13 +47,18 @@
         }
 
         userId = Number(userIdField.value);
-        connectionInfoSpan.innerHTML = "Connection Made Successfully!"
-        connectionInfoSpan.style.color = "green"
+        connectionInfoSpan.innerHTML = "Connecting..."
+        connectionInfoSpan.style.color = "black"
         console.log(userId);
         //The user Id was gotten
         //Initiate the connection
         let wsUrl = "ws://localhost:8000/api/v1/chat/ws/" + userId
         ws = new WebSocket(wsUrl);
+
+        ws.onopen = function (event) {
+            connectionInfoSpan.innerHTML = "Connection Made Successfully!"
+            connectionInfoSpan.style.color = "green"
+        };
 
         ws.onmessage = function (event) {
             var messages = document.getElementById('messages')
@@ -61,6 +66,11 @@
             var content = document.createTextNode(event.data)
             message.appendChild(content)
             messages.appendChild(message)
+        };
+
+        ws.onclose = function (event) {
+            connectionInfoSpan.innerHTML = "WebSocket Connection Closed!"
+            connectionInfoSpan.style.color = "red"
         };
     }
 
