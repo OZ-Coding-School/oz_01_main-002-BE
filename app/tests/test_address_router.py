@@ -2,7 +2,6 @@ from httpx import AsyncClient
 from tortoise.contrib.test import TestCase
 
 from app import app
-from app.dtos.address_response import AddressCreateResponse
 from app.models.address import Address
 from app.models.users import User
 

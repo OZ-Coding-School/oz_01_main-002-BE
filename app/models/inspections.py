@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-from fastapi import HTTPException
 from tortoise import fields
 from tortoise.models import Model
 
@@ -18,6 +17,7 @@ class Inspection(Common, Model):
         "models.Product", related_name="inspections", on_delete=fields.CASCADE
     )
     inspection_count = fields.IntField(default=1)
+    product_id: int
 
     class Meta:
         table = "inspections"

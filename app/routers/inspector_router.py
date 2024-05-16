@@ -1,3 +1,5 @@
+from typing import Tuple
+
 from fastapi import APIRouter
 
 from app.dtos.inspection_response import (
@@ -21,8 +23,8 @@ async def router_get_all_inspection() -> list[InspectionGetResponse]:
     return await service_get_all_inspection()
 
 
-@router.post("/", response_model=InspectionCreateResponse)
-async def router_create_term(request_data: InspectionCreateResponse) -> InspectionCreateResponse:
+@router.post("/")
+async def router_create_term(request_data: InspectionCreateResponse) -> Tuple[dict[str, str], int]:
     return await service_create_inspection(request_data)
 
 
