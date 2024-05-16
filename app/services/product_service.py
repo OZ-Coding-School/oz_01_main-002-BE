@@ -2,6 +2,7 @@ from fastapi import HTTPException
 from tortoise.exceptions import DoesNotExist
 
 from app.dtos.product_response import ProductCreate, ProductOut, ProductUpdate
+from app.models.categories import Category
 from app.models.products import Product
 from app.models.users import User
 
@@ -19,7 +20,7 @@ async def service_get_all_products() -> list[ProductOut]:
                 status=product.status,
                 modify=product.modify,
                 grade=product.grade,
-                category=product.category,
+                category_id=product.category_id,
                 user_id=product.user_id,
             )
             for product in products
@@ -44,7 +45,7 @@ async def service_create_product(product_data: ProductCreate) -> ProductCreate:
         status=product.status,
         modify=product.modify,
         grade=product.grade,
-        category=product.category,
+        category_id=product.category_id,
     )
 
 
@@ -60,7 +61,7 @@ async def service_get_by_product_id(product_id: int) -> ProductOut:
             status=product.status,
             modify=product.modify,
             grade=product.grade,
-            category=product.category,
+            category_id=product.category_id,
             user_id=product.user_id,
         )
     raise HTTPException(status_code=404, detail="Product not found")
@@ -83,7 +84,31 @@ async def service_get_products_by_user_id(user_id: int) -> list[ProductOut]:
             status=product.status,
             modify=product.modify,
             grade=product.grade,
-            category=product.category,
+            category_id=product.category_id,
+            user_id=product.user_id,
+        )
+        for product in products
+    ]
+
+
+async def service_get_products_by_category_id(category_id: int) -> list[ProductOut]:
+    try:
+        await Category.get(id=category_id)
+    except DoesNotExist:
+        raise HTTPException(status_code=404, detail="category not found")
+
+    products = await Product.get_by_category_id(category_id)
+    return [
+        ProductOut(
+            id=product.id,
+            name=product.name,
+            content=product.content,
+            bid_price=product.bid_price,
+            duration=product.duration,
+            status=product.status,
+            modify=product.modify,
+            grade=product.grade,
+            category_id=product.category_id,
             user_id=product.user_id,
         )
         for product in products

@@ -4,6 +4,7 @@ from tortoise import fields
 from tortoise.models import Model
 
 from app.dtos.product_response import ProductCreate, ProductUpdate
+from app.models.categories import Category
 from app.models.common import Common
 from app.models.users import User
 
@@ -16,12 +17,15 @@ class Product(Common, Model):
     status = fields.CharField(max_length=10)
     modify = fields.BooleanField(default=False)
     grade = fields.CharField(max_length=10)
-    category = fields.CharField(max_length=20)
+    category: fields.ForeignKeyRelation[Category] = fields.ForeignKeyField(
+        "models.Category", related_name="categories", on_delete=fields.CASCADE
+    )
     is_approved = fields.BooleanField(default=False)
     user: fields.ForeignKeyRelation[User] = fields.ForeignKeyField(
         "models.User", related_name="products", on_delete=fields.CASCADE
     )
     user_id: int
+    category_id: int
 
     class Meta:
         table = "products"
@@ -41,7 +45,7 @@ class Product(Common, Model):
             status=product_data.status,
             modify=product_data.modify,
             grade=product_data.grade,
-            category=product_data.category,
+            category_id=product_data.category_id,
         )
 
     @classmethod
@@ -51,6 +55,10 @@ class Product(Common, Model):
     @classmethod
     async def get_by_user_id(cls, user_id: int) -> list[Product]:
         return await cls.filter(user_id=user_id).all()
+
+    @classmethod
+    async def get_by_category_id(cls, category_id: int) -> list[Product]:
+        return await cls.filter(category_id=category_id).all()
 
     @classmethod
     async def update_by_product_id(cls, product_id: int, request_data: ProductUpdate) -> Product:

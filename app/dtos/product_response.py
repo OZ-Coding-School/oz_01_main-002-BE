@@ -12,7 +12,7 @@ class ProductBase(BaseModel):
     status: Optional[str] = None
     modify: bool
     grade: str
-    category: str
+    category_id: int
 
 
 class ProductCreate(ProductBase):
@@ -32,4 +32,4 @@ class ProductOut(ProductBase):
     status: str
     modify: bool
     grade: str
-    category: str
+    category_id: int
