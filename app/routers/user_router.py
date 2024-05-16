@@ -4,15 +4,16 @@ from app.dtos.terms_response import TermIDResponse
 from app.dtos.user_response import (
     SendVerificationCodeResponse,
     UserSignUpResponse,
+    VerifyContactResponse,
     VerifyEmailResponse,
-    VerifyNicknameResponse, VerifyContactResponse,
+    VerifyNicknameResponse,
 )
 from app.services.user_service import (
     send_verification_email,
     service_code_authentication,
+    service_contact_verification,
     service_nickname_verification,
     service_signup,
-    service_contact_verification,
 )
 
 router = APIRouter(prefix="/api/v1/users", tags=["User"], redirect_slashes=False)

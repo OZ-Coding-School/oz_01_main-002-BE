@@ -15,8 +15,9 @@ from app.dtos.terms_response import TermIDResponse
 from app.dtos.user_response import (
     SendVerificationCodeResponse,
     UserSignUpResponse,
+    VerifyContactResponse,
     VerifyEmailResponse,
-    VerifyNicknameResponse, VerifyContactResponse,
+    VerifyNicknameResponse,
 )
 from app.models.users import User
 from app.services.term_agreement_service import service_create_terms_agreement
@@ -29,7 +30,7 @@ def is_valid_email(email: str) -> bool:
 
 
 def is_valid_contact(contact: str) -> bool:
-    pattern = r'^01[0-9]-\d{4}-\d{4}$'
+    pattern = r"^01[0-9]-\d{4}-\d{4}$"
     return re.match(pattern, contact) is not None
 
 
