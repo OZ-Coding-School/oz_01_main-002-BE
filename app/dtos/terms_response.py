@@ -18,3 +18,7 @@ class TermsResponseGet(BaseTermResponse):
 
 class TermsResponseCreate(BaseTermResponse):
     pass
+
+
+class TermIDResponse(BaseModel):
+    id: int

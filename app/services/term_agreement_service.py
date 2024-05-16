@@ -30,7 +30,7 @@ async def service_create_terms_agreement(request_data: TermsAgreementCreateRespo
     except DoesNotExist:
         raise HTTPException(status_code=404, detail="term 아이디 값이 없어여")
     try:
-        await User.get_by_user_id(id=request_data.user_id)
+        await User.get_by_user_id(user_id=request_data.user_id)
     except DoesNotExist:
         raise HTTPException(status_code=404, detail="user 아이디 값이 없어여")
 

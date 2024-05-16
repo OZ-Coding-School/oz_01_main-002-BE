@@ -11,7 +11,7 @@ from app.models.users import User
 class TestProductRouter(TestCase):
     @staticmethod
     async def create_test_user() -> User:
-        return await User.create_by_user(
+        return await User.create(
             name="test_user",
             email="gudqls0516@naver.com",
             password="pw12345",
