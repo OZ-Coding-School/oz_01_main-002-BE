@@ -14,6 +14,7 @@ TORTOISE_APP_MODELS = [
     "app.models.address",
     "app.models.categories",
     "app.models.chat",
+    "app.models.carries",
 ]
 
 TORTOISE_ORM = {

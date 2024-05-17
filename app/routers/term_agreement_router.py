@@ -18,5 +18,5 @@ async def router_get_by_all_term_agreement() -> list[TermsAgreementGetResponse]:
 
 
 @router.post("/", response_model=TermsAgreementCreateResponse)
-async def router_create_term_agreement(request_data: TermsAgreementCreateResponse) -> TermsAgreementCreateResponse:
+async def router_create_term_agreement(request_data: TermsAgreementCreateResponse) -> None:
     return await service_create_terms_agreement(request_data)

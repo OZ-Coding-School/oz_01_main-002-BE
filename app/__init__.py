@@ -3,6 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from app.configs.database_settings import initialize
 from app.routers.address_router import router as address_router
+from app.routers.carries_router import router as carries_router
 from app.routers.category_router import router as category_router
 from app.routers.chat_router import router as chat_router
 from app.routers.inspector_router import router as inspector_router
@@ -27,4 +28,5 @@ app.include_router(term_agreement_router)
 app.include_router(address_router)
 app.include_router(category_router)
 app.include_router(chat_router)
+app.include_router(carries_router)
 initialize(app)

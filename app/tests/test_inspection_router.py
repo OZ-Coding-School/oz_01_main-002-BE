@@ -100,7 +100,7 @@ class TestInspectionRouter(TestCase):
             response = await ac.post("/api/v1/inspection/", json=data)
 
             # 응답 상태 코드 확인
-            assert response.status_code == 200
+            assert response.status_code == 201
 
             # Inspection 데이터가 생성되었는지 확인
             inspection = await Inspection.get_or_none(product_id=product_test.id)
@@ -158,10 +158,10 @@ class TestInspectionRouter(TestCase):
                 user_id=test_user.id,
             )
             # Inspection 데이터 생성
-            await Inspection.create(inspector="inspector1", product_id=product_test.id, inspection_count=1)
+            inspection = await Inspection.create(inspector="inspector1", product_id=product_test.id, inspection_count=1)
 
             # GET 요청을 보내고 응답을 받음
-            response = await ac.get(f"/api/v1/inspection/{product_test.id}")
+            response = await ac.get(f"/api/v1/inspection/{inspection.id}")
 
             # 응답 상태 코드 확인
             assert response.status_code == 200
@@ -190,13 +190,13 @@ class TestInspectionRouter(TestCase):
                 user_id=test_user.id,
             )
             # Inspection 데이터 생성
-            await Inspection.create(inspector="inspector1", product_id=product_test.id, inspection_count=1)
+            inspection = await Inspection.create(inspector="inspector1", product_id=product_test.id, inspection_count=1)
 
             # PUT 요청에 사용될 데이터
             data = {"inspector": "updated_inspector", "inspection_count": 2}
 
             # PUT 요청을 보내고 응답을 받음
-            response = await ac.put(f"/api/v1/inspection/{product_test.id}", json=data)
+            response = await ac.put(f"/api/v1/inspection/{inspection.id}", json=data)
 
             # 응답 상태 코드 확인
             assert response.status_code == 200
