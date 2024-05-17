@@ -14,9 +14,11 @@ class TermsAgreement(Common, Model):
     user: fields.ForeignKeyRelation[User] = fields.ForeignKeyField(
         "models.User", related_name="terms_agreements", on_delete=fields.CASCADE
     )
+    user_id: int
     term: fields.ForeignKeyRelation[Terms] = fields.ForeignKeyField(
         "models.Terms", related_name="terms_agreements", on_delete=fields.CASCADE
     )
+    term_id: int
 
     class Meta:
         table = "terms_agreements"

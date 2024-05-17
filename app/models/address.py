@@ -19,6 +19,7 @@ class Address(Common, Model):
     detail_address = fields.CharField(max_length=50)
     zip_code = fields.CharField(max_length=50)
     is_main = fields.BooleanField(default=True)
+    user_id: int
 
     class Meta:
         table = "address"

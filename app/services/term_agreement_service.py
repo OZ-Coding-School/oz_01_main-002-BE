@@ -15,8 +15,8 @@ async def service_get_all_by_terms_agreement() -> list[TermsAgreementGetResponse
     return [
         TermsAgreementGetResponse(
             id=terms_agreement.id,
-            user_id=terms_agreement.user_id,  # type: ignore
-            term_id=terms_agreement.term_id,  # type: ignore
+            user_id=terms_agreement.user_id,
+            term_id=terms_agreement.term_id,
             created_at=terms_agreement.created_at,
             updated_at=terms_agreement.updated_at,
         )
@@ -24,7 +24,7 @@ async def service_get_all_by_terms_agreement() -> list[TermsAgreementGetResponse
     ]
 
 
-async def service_create_terms_agreement(request_data: TermsAgreementCreateResponse) -> TermsAgreementCreateResponse:
+async def service_create_terms_agreement(request_data: TermsAgreementCreateResponse) -> None:
     try:
         await Terms.get_by_terms_id(id=request_data.term_id)
     except DoesNotExist:
@@ -36,7 +36,5 @@ async def service_create_terms_agreement(request_data: TermsAgreementCreateRespo
 
     terms_agreement = await TermsAgreement.create_by_terms_agreement(request_data)
 
-    return TermsAgreementCreateResponse(
-        user_id=terms_agreement.user_id,  # type: ignore
-        term_id=terms_agreement.term_id,  # type: ignore
-    )
+    if terms_agreement:
+        raise HTTPException(status_code=201, detail="terms_agreement 성공적으로 생성되었습니다.")

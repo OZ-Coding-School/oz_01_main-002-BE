@@ -21,7 +21,7 @@ async def service_get_all_address() -> list[AddressGetResponse]:
             detail_address=address.detail_address,
             zip_code=address.zip_code,
             is_main=address.is_main,
-            user_id=address.user_id,  # type: ignore
+            user_id=address.user_id,
             created_at=address.created_at,
             updated_at=address.updated_at,
         )
@@ -41,7 +41,7 @@ async def service_get_by_address_id(address_id: int) -> AddressGetResponse:
         detail_address=address.detail_address,
         zip_code=address.zip_code,
         is_main=address.is_main,
-        user_id=address.user_id,  # type: ignore
+        user_id=address.user_id,
         created_at=address.created_at,
         updated_at=address.updated_at,
     )
@@ -70,7 +70,7 @@ async def service_update_address(address_id: int, request_data: AddressUpdateRes
 
         # 메인 주소를 다른 걸 픽 했을 때 원래 True 였던 메인은 False 로 Update
         if request_data.is_main:
-            await Address.filter(user_id=exists.user_id, is_main=True).exclude(id=address_id).update(is_main=False)  # type: ignore
+            await Address.filter(user_id=exists.user_id, is_main=True).exclude(id=address_id).update(is_main=False)
 
         # 만약에 처음 만들 때 is_main 은 디폴트 값이 True 지만 처음만 만들고 그 한개를 False 로 Update 틀 막을지 말지 상의 후 넣을 예정
 
