@@ -1,3 +1,5 @@
+from typing import Tuple
+
 from fastapi import HTTPException
 from tortoise.exceptions import DoesNotExist
 
@@ -12,11 +14,13 @@ from app.models.products import Product
 
 async def service_get_all_inspection() -> list[InspectionGetResponse]:
     inspections = await Inspection.get_all_by_inspection()
+    if len(inspections) == 0:
+        raise HTTPException(status_code=404, detail="검수자를 찾을 수 없습니다.")
     return [
         InspectionGetResponse(
             id=inspection.id,
             inspector=inspection.inspector,
-            product_id=inspection.product_id,  # type: ignore
+            product_id=inspection.product_id,
             inspection_count=inspection.inspection_count,
             created_at=inspection.created_at,
             updated_at=inspection.updated_at,
@@ -26,55 +30,52 @@ async def service_get_all_inspection() -> list[InspectionGetResponse]:
 
 
 async def service_get_detail_inspection(product_id: int) -> list[InspectionGetResponse]:
-    try:
-        inspections = await Inspection.get_by_inspection_detail(product_id=product_id)
-        if not inspections:
-            raise HTTPException(status_code=404, detail="Inspections not found")
-        return [
-            InspectionGetResponse(
-                id=inspection.id,
-                inspector=inspection.inspector,
-                product_id=inspection.product_id,  # type: ignore
-                inspection_count=inspection.inspection_count,
-                created_at=inspection.created_at,
-                updated_at=inspection.updated_at,
-            )
-            for inspection in inspections
-        ]
-    except DoesNotExist:
-        raise HTTPException(status_code=404, detail="Inspections not found")
-
-
-async def service_get_one_inspection(inspection_id: int) -> InspectionGetResponse:
-    try:
-        inspection = await Inspection.get_by_inspection_id(inspection_id)
-        if inspection is None:
-            raise HTTPException(status_code=404, detail="Inspection 아이디 값이 없습니다")
-
-        return InspectionGetResponse(
+    inspections = await Inspection.get_by_inspection_detail(product_id=product_id)
+    if not inspections:
+        raise HTTPException(status_code=404, detail="검수자를 찾을 수 없습니다.")
+    return [
+        InspectionGetResponse(
             id=inspection.id,
             inspector=inspection.inspector,
-            product_id=inspection.product_id,  # type: ignore
+            product_id=inspection.product_id,
             inspection_count=inspection.inspection_count,
             created_at=inspection.created_at,
             updated_at=inspection.updated_at,
         )
-    except DoesNotExist:
-        raise HTTPException(status_code=404, detail="Inspection을 찾을 수 없습니다.")
+        for inspection in inspections
+    ]
 
 
-async def service_create_inspection(request_data: InspectionCreateResponse) -> InspectionCreateResponse:
-    try:
-        await Product.get_by_product_id(product_id=request_data.product_id)
-    except DoesNotExist:
+async def service_get_one_inspection(inspection_id: int) -> InspectionGetResponse:
+    inspection = await Inspection.get_by_inspection_id(inspection_id)
+    if inspection is None:
+        raise HTTPException(status_code=404, detail="검수자를 찾을 수 없습니다.")
+
+    return InspectionGetResponse(
+        id=inspection.id,
+        inspector=inspection.inspector,
+        product_id=inspection.product_id,
+        inspection_count=inspection.inspection_count,
+        created_at=inspection.created_at,
+        updated_at=inspection.updated_at,
+    )
+
+
+async def service_create_inspection(request_data: InspectionCreateResponse) -> Tuple[dict[str, str], int]:
+    product = await Product.get_by_product_id(product_id=request_data.product_id)
+    if product is None:
         raise HTTPException(status_code=404, detail="Product 아이디 값이 없습니다")
+    product.is_approved = True
+    await product.save()
+
     inspection = await Inspection.create_by_inspection(request_data)
 
-    return InspectionCreateResponse(
-        inspector=inspection.inspector,
-        product_id=inspection.product_id,  # type: ignore
-        inspection_count=inspection.inspection_count,
-    )
+    if inspection:
+        # 성공 메시지와 상태 코드 반환
+        return {"message": "Inspection 생성이 성공적으로 완료되었습니다."}, 201
+    else:
+        # 검수 생성 실패 시 HTTP 예외 발생
+        raise HTTPException(status_code=500, detail="검수 생성에 실패했습니다")
 
 
 async def service_update_inspection(
