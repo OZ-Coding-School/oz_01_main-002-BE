@@ -29,3 +29,13 @@ class VerifyNicknameResponse(BaseModel):
 
 class VerifyContactResponse(BaseModel):
     contact: str
+
+
+class UserLoginResponse(BaseModel):
+    email: str
+    password: str
+
+
+class TokenResponse(BaseModel):
+    token_type: str
+    token: str

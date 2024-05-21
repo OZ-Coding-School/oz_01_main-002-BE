@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from passlib.context import CryptContext  # type: ignore
 from tortoise import fields
 from tortoise.models import Model
 
@@ -10,7 +11,7 @@ from app.models.common import Common
 class User(Common, Model):
     name = fields.CharField(max_length=30)
     email = fields.CharField(max_length=50, unique=True)
-    password = fields.CharField(max_length=50)
+    password = fields.CharField(max_length=255)
     gender = fields.CharField(max_length=6)
     age = fields.IntField(max_length=3)
     contact = fields.CharField(max_length=15, unique=True)
@@ -30,10 +31,14 @@ class User(Common, Model):
 
     @classmethod
     async def create_by_user(cls, request_data: UserSignUpResponse) -> None:
+
+        pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+        hashed_password = pwd_context.hash(request_data.password)
+
         await cls.create(
             name=request_data.name,
             email=request_data.email,
-            password=request_data.password,
+            password=hashed_password,
             gender=request_data.gender,
             age=request_data.age,
             contact=request_data.contact,
@@ -47,3 +52,17 @@ class User(Common, Model):
     @classmethod
     async def get_by_user_contact(cls, contact: str) -> User:
         return await cls.get(contact=contact)
+
+    @classmethod
+    async def verify_user(cls, email: str, password: str) -> bool:
+        user = await cls.get_or_none(email=email)
+
+        if user is None:
+            return False
+
+        pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+
+        if pwd_context.verify(password, user.password):
+            return True
+
+        return False

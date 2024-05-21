@@ -19,3 +19,5 @@ class Settings(BaseSettings):
     GMAIL_USERNAME: str = ""
     GMAIL_PASSWORD: str = ""
     REDIS_URL: str = ""
+    SECRET_KEY: str = ""
+    ALGORITHM: str = ""
