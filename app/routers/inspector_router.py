@@ -22,7 +22,7 @@ async def router_get_all_inspection() -> list[InspectionGetResponse]:
 
 
 @router.post("/")
-async def router_create_term(request_data: InspectionCreateResponse) -> None:
+async def router_create_inspection(request_data: InspectionCreateResponse) -> None:
     return await service_create_inspection(request_data)
 
 
