@@ -21,10 +21,7 @@ class ConnectionManager:
         """
         self.connections: Dict[str, Set[int]] = {}  # 각 방에 연결된 사용자를 추적함.
         self.user_connections: Dict[int, WebSocket] = {}  # 사용자 ID와 WebSocket 연결을 추적함.
-        self.redis: Optional[aioredis.Redis] = None  # Redis 인스턴스를 저장하는 변수.
-
-    async def connect_redis(self) -> None:
-        self.redis = aioredis.Redis.from_url(settings.REDIS_URL)
+        self.redis: Optional[aioredis.Redis] = aioredis.Redis.from_url(settings.REDIS_URL)
 
     async def disconnect_redis(self) -> None:
         if self.redis:

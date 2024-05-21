@@ -13,13 +13,6 @@ router = APIRouter(prefix="/api/v1/chat", tags=["chat"], redirect_slashes=False)
 connection_manager = ConnectionManager()
 
 
-@router.on_event("startup")
-async def startup() -> None:
-    print("Connecting to redis")
-    await connection_manager.connect_redis()
-    print("Connected to redis")
-
-
 @router.on_event("shutdown")
 async def shutdown() -> None:
     print("Disconnecting from redis")

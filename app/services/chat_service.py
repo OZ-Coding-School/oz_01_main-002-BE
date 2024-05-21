@@ -64,9 +64,8 @@ async def service_websocket_endpoint(user_id: int, websocket: WebSocket) -> None
             # 받은 메시지를 채팅방의 모든 사용자에게 전송함.
             room_id = data["room_id"]
             message = data["message"]
-            # 방이 있는지 확인
-            if await MessageToRoomModel.filter(room_id=room_id).exists():
-                await MessageToRoomModel.create_by_message(room_id=room_id, message=message, user_id=user_id)
+
+            await MessageToRoomModel.create_by_message(room_id=room_id, message=message, user_id=user_id)
 
             await connection_manager.send_message_to_room(
                 message=message, room_id=room_id, user_nickname=user.nickname, ws_connection=websocket
