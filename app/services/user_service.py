@@ -2,11 +2,15 @@ import logging
 import random
 import re
 import smtplib
+from collections.abc import Mapping
+from datetime import datetime, timedelta, timezone
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
+from typing import Any
 
 import orjson
 from fastapi import HTTPException
+from jose import JWTError, jwt  # type: ignore
 from tortoise.exceptions import DoesNotExist, IntegrityError
 
 from app.configs import settings
@@ -14,6 +18,8 @@ from app.dtos.terms_agreement_response import TermsAgreementCreateResponse
 from app.dtos.terms_response import TermIDResponse
 from app.dtos.user_response import (
     SendVerificationCodeResponse,
+    TokenResponse,
+    UserLoginResponse,
     UserSignUpResponse,
     VerifyContactResponse,
     VerifyEmailResponse,
@@ -178,3 +184,87 @@ async def service_signup(request_data: UserSignUpResponse, term_data: list[TermI
 
     except IntegrityError:
         raise HTTPException(status_code=400, detail="Bad Request - User already registered")
+
+
+def create_access_token(data: Mapping[str, str | float], expires_delta: timedelta | None = None) -> Any:
+    to_encode = dict(data)
+    if expires_delta:
+        expire = datetime.now(timezone.utc) + expires_delta
+    else:
+        expire = datetime.now(timezone.utc) + timedelta(minutes=5)
+    to_encode.update({"exp": expire.timestamp()})
+    access_token = jwt.encode(to_encode, settings.SECRET_KEY, algorithm=settings.ALGORITHM)
+    return access_token
+
+
+def create_refresh_token(data: Mapping[str, str | float], expires_delta: timedelta | None = None) -> Any:
+    to_encode = dict(data)
+    if expires_delta:
+        expire = datetime.now(timezone.utc) + expires_delta
+    else:
+        expire = datetime.now(timezone.utc) + timedelta(days=1)
+    to_encode.update({"exp": expire.timestamp()})
+    refresh_token = jwt.encode(to_encode, settings.SECRET_KEY, algorithm=settings.ALGORITHM)
+    return refresh_token
+
+
+async def service_login(
+    request_data: UserLoginResponse,
+) -> tuple[dict[str, str], str]:
+    try:
+        user = await User.verify_user(request_data.email, request_data.password)
+        if not user:
+            raise HTTPException(status_code=401, detail="UNAUTHORIZED - Invalid User")
+    except HTTPException:
+        raise HTTPException(status_code=400, detail="Bad Request - Invalid User")
+
+    user_data = await User.get(email=request_data.email)
+
+    try:
+        token = await redis.get(f"user:{user_data.id}")
+        if token is not None:
+            await redis.delete(f"user:{user_data.id}")
+
+    except DoesNotExist:
+        pass
+
+    access_token_data = {"sub": str(user_data.id), "email": user_data.email}
+    refresh_token_data = {"sub": "re-" + str(user_data.id) + "-er", "email": user_data.email}
+
+    access_token = create_access_token(data=access_token_data, expires_delta=timedelta(minutes=5))
+    refresh_token = create_refresh_token(data=refresh_token_data, expires_delta=timedelta(days=1))
+
+    await redis.set(f"user:{user_data.id}", refresh_token)
+    await redis.expire(f"user:{user_data.id}", timedelta(days=1))
+
+    return {"user": str(user_data.id), "access_token": access_token}, refresh_token
+
+
+async def service_token_refresh(request_data: TokenResponse) -> dict[str, str]:
+    if request_data.token_type == "refresh_token":
+        user_token = jwt.decode(request_data.token, settings.SECRET_KEY, algorithms=settings.ALGORITHM)
+        user_id = user_token["sub"].split("-")[1]
+        server_token = jwt.decode(
+            await redis.get(f"user:{user_id}"), settings.SECRET_KEY, algorithms=settings.ALGORITHM
+        )
+        server_id = server_token["sub"].split("-")[1]
+
+        if user_id == server_id:
+            user_data = await User.get(id=server_token["sub"].split("-")[1])
+            access_token_data = {"sub": str(user_data.id), "email": user_data.email}
+            access_token = create_access_token(data=access_token_data, expires_delta=timedelta(minutes=5))
+
+            return {"user": str(user_data.id), "access_token": access_token}
+
+    raise HTTPException(status_code=401, detail="UNAUTHORIZED - Invalid Token")
+
+
+async def service_check_token(request_data: TokenResponse) -> None:
+    if request_data.token_type == "access_token":
+        try:
+            jwt.decode(request_data.token, settings.SECRET_KEY, algorithms=settings.ALGORITHM)
+            raise HTTPException(status_code=200, detail="Token is ready for use")
+        except JWTError as e:
+            raise HTTPException(status_code=401, detail=str(e))
+
+    raise HTTPException(status_code=401, detail="Invalid Token")
