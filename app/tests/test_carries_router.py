@@ -1,4 +1,7 @@
+from typing import Any
+
 from httpx import AsyncClient
+from passlib.context import CryptContext  # type: ignore
 from tortoise.contrib.test import TestCase
 
 from app import app
@@ -7,14 +10,20 @@ from app.models.categories import Category
 from app.models.products import Product
 from app.models.users import User
 
+pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+
 
 class TestCarriesRouter(TestCase):
+
     @staticmethod
-    async def create_test_user() -> User:
+    def hash_password(password: str) -> Any:
+        return pwd_context.hash(password)
+
+    async def create_test_user(self) -> User:
         return await User.create(
             name="test_user",
-            email="gudqls0516@naver.com",
-            password="pw12345",
+            email="test@example.com",
+            password=self.hash_password("test_password"),
             gender="남",
             age=12,
             contact="test",
@@ -47,6 +56,15 @@ class TestCarriesRouter(TestCase):
             category_test = await self.create_test_category()
             product_test = await self.create_test_product(user_id=user_test.id, category_id=category_test.id)
 
+            # 로그인하여 액세스 토큰을 획득합니다.
+            login_data = {"email": "test@example.com", "password": "test_password"}
+            res = await ac.post("/api/v1/users/login", json=login_data)
+
+            assert res.status_code == 200
+
+            token = res.json().get("access_token")
+            headers = {"Authorization": f"Bearer {token}"}
+
             # POST 요청에 사용될 데이터
             data = {
                 "product_id": product_test.id,
@@ -58,7 +76,7 @@ class TestCarriesRouter(TestCase):
             }
 
             # POST 요청을 보내고 응답을 받음
-            response = await ac.post("/api/v1/carries/", json=data)
+            response = await ac.post("/api/v1/carries/", json=data, headers=headers)
 
             # 응답 상태 코드 확인
             assert response.status_code == 201
@@ -68,6 +86,16 @@ class TestCarriesRouter(TestCase):
             user_test = await self.create_test_user()
             category_test = await self.create_test_category()
             product_test = await self.create_test_product(user_id=user_test.id, category_id=category_test.id)
+
+            # 로그인하여 액세스 토큰을 획득합니다.
+            login_data = {"email": "test@example.com", "password": "test_password"}
+            res = await ac.post("/api/v1/users/login", json=login_data)
+
+            assert res.status_code == 200
+
+            token = res.json().get("access_token")
+            headers = {"Authorization": f"Bearer {token}"}
+
             await Carries.create(
                 product_id=product_test.id,
                 address="Test address",
@@ -85,7 +113,7 @@ class TestCarriesRouter(TestCase):
                 amount=200,
             )
             # GET 요청을 보내고 응답을 받음
-            response = await ac.get("/api/v1/carries/")
+            response = await ac.get("/api/v1/carries/", headers=headers)
 
             # 응답 상태 코드 확인
             assert response.status_code == 200
@@ -112,6 +140,16 @@ class TestCarriesRouter(TestCase):
             user_test = await self.create_test_user()
             category_test = await self.create_test_category()
             product_test = await self.create_test_product(user_id=user_test.id, category_id=category_test.id)
+
+            # 로그인하여 액세스 토큰을 획득합니다.
+            login_data = {"email": "test@example.com", "password": "test_password"}
+            res = await ac.post("/api/v1/users/login", json=login_data)
+
+            assert res.status_code == 200
+
+            token = res.json().get("access_token")
+            headers = {"Authorization": f"Bearer {token}"}
+
             carry_test = await Carries.create(
                 product_id=product_test.id,
                 address="Test address",
@@ -121,7 +159,7 @@ class TestCarriesRouter(TestCase):
                 amount=100,
             )
             # GET 요청을 보내고 응답을 받음
-            response = await ac.get(f"/api/v1/carries/{carry_test.id}")
+            response = await ac.get(f"/api/v1/carries/{carry_test.id}", headers=headers)
 
             # 응답 상태 코드 확인
             assert response.status_code == 200
@@ -141,6 +179,16 @@ class TestCarriesRouter(TestCase):
             user_test = await self.create_test_user()
             category_test = await self.create_test_category()
             product_test = await self.create_test_product(user_id=user_test.id, category_id=category_test.id)
+
+            # 로그인하여 액세스 토큰을 획득합니다.
+            login_data = {"email": "test@example.com", "password": "test_password"}
+            res = await ac.post("/api/v1/users/login", json=login_data)
+
+            assert res.status_code == 200
+
+            token = res.json().get("access_token")
+            headers = {"Authorization": f"Bearer {token}"}
+
             carry_test = await Carries.create(
                 product_id=product_test.id,
                 address="Test address",
@@ -159,7 +207,7 @@ class TestCarriesRouter(TestCase):
             }
 
             # PUT 요청을 보내고 응답을 받음
-            response = await ac.put(f"/api/v1/carries/{carry_test.id}", json=data)
+            response = await ac.put(f"/api/v1/carries/{carry_test.id}", json=data, headers=headers)
 
             # 응답 상태 코드 확인
             assert response.status_code == 200
@@ -178,6 +226,16 @@ class TestCarriesRouter(TestCase):
             user_test = await self.create_test_user()
             category_test = await self.create_test_category()
             product_test = await self.create_test_product(user_id=user_test.id, category_id=category_test.id)
+
+            # 로그인하여 액세스 토큰을 획득합니다.
+            login_data = {"email": "test@example.com", "password": "test_password"}
+            res = await ac.post("/api/v1/users/login", json=login_data)
+
+            assert res.status_code == 200
+
+            token = res.json().get("access_token")
+            headers = {"Authorization": f"Bearer {token}"}
+
             carry_test = await Carries.create(
                 product_id=product_test.id,
                 address="Test address",
@@ -187,7 +245,7 @@ class TestCarriesRouter(TestCase):
                 amount=100,
             )
             # DELETE 요청을 보내고 응답을 받음
-            response = await ac.delete(f"/api/v1/carries/{carry_test.id}")
+            response = await ac.delete(f"/api/v1/carries/{carry_test.id}", headers=headers)
 
             # 응답 상태 코드 확인
             assert response.status_code == 200
