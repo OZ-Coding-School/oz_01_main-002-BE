@@ -1,5 +1,4 @@
-from fastapi import APIRouter, Response, Depends
-from app.services.user_service import get_current_user
+from fastapi import APIRouter, Depends, Response
 
 from app.dtos.terms_response import TermIDResponse
 from app.dtos.user_response import (
@@ -13,6 +12,7 @@ from app.dtos.user_response import (
     VerifyNicknameResponse,
 )
 from app.services.user_service import (
+    get_current_user,
     send_verification_email,
     service_check_token,
     service_code_authentication,

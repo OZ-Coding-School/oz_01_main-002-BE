@@ -1,4 +1,5 @@
 from datetime import datetime
+
 from fastapi import HTTPException
 from tortoise.exceptions import DoesNotExist, IntegrityError
 
@@ -65,7 +66,7 @@ async def service_create_payment(request_data: PaymentCreateResponse, current_us
         if total_product_amount != request_data.total_amount:
             raise HTTPException(
                 status_code=400,
-                detail=f"상품 총 금액 합계와 요청된 총 금액이 일치하지 않습니다. (상품 총 금액 합계: {total_product_amount}, 요청된 총 금액: {request_data.total_amount})"
+                detail=f"상품 총 금액 합계와 요청된 총 금액이 일치하지 않습니다. (상품 총 금액 합계: {total_product_amount}, 요청된 총 금액: {request_data.total_amount})",
             )
 
         uuid = datetime.now().strftime("%Y%m%d%H%M%S%f")[:-3]
