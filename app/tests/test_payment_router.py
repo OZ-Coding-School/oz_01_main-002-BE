@@ -1,4 +1,7 @@
+from typing import Any
+
 from httpx import AsyncClient
+from passlib.context import CryptContext  # type: ignore
 from tortoise.contrib.test import TestCase
 
 from app import app
@@ -7,14 +10,19 @@ from app.models.payments import Payment
 from app.models.products import Product
 from app.models.users import User
 
+pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+
 
 class TestPaymentRouter(TestCase):
     @staticmethod
-    async def create_test_user() -> User:
+    def hash_password(password: str) -> Any:
+        return pwd_context.hash(password)
+
+    async def create_test_user(self) -> User:
         return await User.create(
             name="test_user",
-            email="gudqls0516@naver.com",
-            password="pw12345",
+            email="test@example.com",
+            password=self.hash_password("test_password"),
             gender="남",
             age=12,
             contact="test",
@@ -47,11 +55,20 @@ class TestPaymentRouter(TestCase):
             category_test = await self.create_test_category()
             product_test = await self.create_test_product(user_id=user_test.id, category_id=category_test.id)
 
+            # 로그인하여 액세스 토큰을 획득합니다.
+            login_data = {"email": "test@example.com", "password": "test_password"}
+            res = await ac.post("/api/v1/users/login", json=login_data)
+
+            assert res.status_code == 200
+
+            token = res.json().get("access_token")
+            headers = {"Authorization": f"Bearer {token}"}
+
             # POST 요청에 사용될 데이터
             data = {"user_id": user_test.id, "total_amount": 100.0, "product_ids": [product_test.id]}
 
             # POST 요청을 보내고 응답을 받음
-            response = await ac.post("/api/v1/payments/", json=data)
+            response = await ac.post("/api/v1/payments/", json=data, headers=headers)
 
             # 응답 상태 코드 확인
             assert response.status_code == 201
@@ -60,6 +77,16 @@ class TestPaymentRouter(TestCase):
         async with AsyncClient(app=app, base_url="http://test") as ac:
             user_test = await self.create_test_user()
             category_test = await self.create_test_category()
+
+            # 로그인하여 액세스 토큰을 획득합니다.
+            login_data = {"email": "test@example.com", "password": "test_password"}
+            res = await ac.post("/api/v1/users/login", json=login_data)
+
+            assert res.status_code == 200
+
+            token = res.json().get("access_token")
+            headers = {"Authorization": f"Bearer {token}"}
+
             product_test = await self.create_test_product(user_id=user_test.id, category_id=category_test.id)
             payment_test = await Payment.create(
                 user_id=user_test.id,
@@ -67,7 +94,7 @@ class TestPaymentRouter(TestCase):
             )
             await payment_test.products.add(product_test)
             # GET 요청을 보내고 응답을 받음
-            response = await ac.get(f"/api/v1/payments/{payment_test.id}/")
+            response = await ac.get(f"/api/v1/payments/{payment_test.id}/", headers=headers)
 
             # 응답 상태 코드 확인
             assert response.status_code == 200

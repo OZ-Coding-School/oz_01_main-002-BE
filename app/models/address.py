@@ -33,14 +33,14 @@ class Address(Common, Model):
         return await cls.get_or_none(id=address_id)
 
     @classmethod
-    async def create_by_address(cls, request_data: AddressCreateResponse) -> Address:
+    async def create_by_address(cls, request_data: AddressCreateResponse, current_user: int) -> Address:
 
         return await cls.create(
             name=request_data.name,
             address=request_data.address,
             detail_address=request_data.detail_address,
             zip_code=request_data.zip_code,
-            user_id=request_data.user_id,
+            user_id=current_user,
         )
 
     @classmethod

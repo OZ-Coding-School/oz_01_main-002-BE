@@ -12,7 +12,7 @@ class AddressBase(BaseModel):
 
 
 class AddressCreateResponse(AddressBase):
-    user_id: int
+    pass
 
 
 class AddressGetResponse(AddressBase):

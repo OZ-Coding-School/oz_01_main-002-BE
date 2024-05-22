@@ -26,8 +26,8 @@ class Payment(Common, Model):
         return await cls.get(id=payment_id).prefetch_related("products")
 
     @classmethod
-    async def create_by_payment(cls, request_data: PaymentCreateResponse) -> Payment:
-        payment = await cls.create(user_id=request_data.user_id, total_amount=request_data.total_amount)
+    async def create_by_payment(cls, request_data: PaymentCreateResponse, current_user: int) -> Payment:
+        payment = await cls.create(user_id=current_user, total_amount=request_data.total_amount)
 
         products = await Product.filter(id__in=request_data.product_ids)
         await payment.products.add(*products)

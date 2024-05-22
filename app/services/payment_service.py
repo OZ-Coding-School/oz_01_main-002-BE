@@ -31,9 +31,9 @@ async def service_get_by_payment(payment_id: int) -> PaymentGetResponse:
     )
 
 
-async def service_create_payment(request_data: PaymentCreateResponse) -> None:
+async def service_create_payment(request_data: PaymentCreateResponse, current_user: int) -> None:
     try:
-        user = await User.get(id=request_data.user_id)
+        await User.get(id=current_user)
     except DoesNotExist:
         raise HTTPException(status_code=404, detail="User 없습니다.")
 
@@ -46,7 +46,7 @@ async def service_create_payment(request_data: PaymentCreateResponse) -> None:
     try:
         # Todo  유저가 가지고있는 돈과 products돈 뺴줘서 업데이트 하기 추후에 넣을 예정
 
-        payment = await Payment.create_by_payment(request_data)
+        payment = await Payment.create_by_payment(request_data, current_user)
         if payment:
             # 성공 메시지와 상태 코드 반환
             raise HTTPException(status_code=201, detail="payment 성공적으로 생성되었습니다.")

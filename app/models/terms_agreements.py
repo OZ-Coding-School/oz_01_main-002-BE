@@ -28,8 +28,10 @@ class TermsAgreement(Common, Model):
         return await cls.all()
 
     @classmethod
-    async def create_by_terms_agreement(cls, request_data: TermsAgreementCreateResponse) -> TermsAgreement:
+    async def create_by_terms_agreement(
+        cls, request_data: TermsAgreementCreateResponse, current_user: int
+    ) -> TermsAgreement:
         return await cls.create(
-            user_id=request_data.user_id,
+            user_id=current_user,
             term_id=request_data.term_id,
         )
