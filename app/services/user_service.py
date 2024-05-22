@@ -181,7 +181,7 @@ async def service_signup(request_data: UserSignUpResponse, term_data: list[TermI
         user_term_agreements = [TermsAgreementCreateResponse(user_id=user.id, term_id=term_id) for term_id in data]
 
         for user_term_agreement in user_term_agreements:
-            await service_create_terms_agreement(user_term_agreement)
+            await service_create_terms_agreement(user_term_agreement, user.id)
 
         raise HTTPException(status_code=201, detail="Created - successfully signup!")
 

@@ -1,7 +1,9 @@
-from httpx import AsyncClient
-from tortoise.contrib.test import TestCase
-from passlib.context import CryptContext  # type: ignore
 from typing import Any
+
+from httpx import AsyncClient
+from passlib.context import CryptContext  # type: ignore
+from tortoise.contrib.test import TestCase
+
 from app import app
 from app.models.terms import Terms
 from app.models.terms_agreements import TermsAgreement
