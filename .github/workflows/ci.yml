@@ -68,3 +68,11 @@ jobs:
       - name: Run mypy
         run: |
           poetry run mypy .
+
+  DOCKER_PUSH:
+    runs-on: ubuntu-20.04
+    needs: CI
+    steps:
+      - name: Run black
+        run: |
+          poetry run black . --check
