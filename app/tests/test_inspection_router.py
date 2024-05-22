@@ -1,4 +1,7 @@
+from typing import Any
+
 from httpx import AsyncClient
+from passlib.context import CryptContext  # type: ignore
 from tortoise.contrib.test import TestCase
 
 from app import app
@@ -7,14 +10,20 @@ from app.models.inspections import Inspection
 from app.models.products import Product
 from app.models.users import User
 
+pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+
 
 class TestInspectionRouter(TestCase):
+
     @staticmethod
-    async def create_test_user() -> User:
+    def hash_password(password: str) -> Any:
+        return pwd_context.hash(password)
+
+    async def create_test_user(self) -> User:
         return await User.create(
             name="test_user",
-            email="gudqls0516@naver.com",
-            password="pw12345",
+            email="test@example.com",
+            password=self.hash_password("test_password"),
             gender="남",
             age=12,
             contact="test",
@@ -30,6 +39,16 @@ class TestInspectionRouter(TestCase):
         async with AsyncClient(app=app, base_url="http://test") as ac:
             test_user = await self.create_test_user()
             test_category = await self.create_test_category()
+
+            # 로그인하여 액세스 토큰을 획득합니다.
+            login_data = {"email": "test@example.com", "password": "test_password"}
+            res = await ac.post("/api/v1/users/login", json=login_data)
+
+            assert res.status_code == 200
+
+            token = res.json().get("access_token")
+            headers = {"Authorization": f"Bearer {token}"}
+
             product_test = await Product.create(
                 name="test_product",
                 content="test content",
@@ -57,7 +76,7 @@ class TestInspectionRouter(TestCase):
             await Inspection.create(inspector="inspector2", product_id=product_test1.id, inspection_count=2)
 
             # GET 요청을 보내고 응답을 받음
-            response = await ac.get("/api/v1/inspection/")
+            response = await ac.get("/api/v1/inspection/", headers=headers)
 
             # 응답 상태 코드 확인
             assert response.status_code == 200
@@ -80,6 +99,16 @@ class TestInspectionRouter(TestCase):
         async with AsyncClient(app=app, base_url="http://test") as ac:
             test_user = await self.create_test_user()
             test_category = await self.create_test_category()
+
+            # 로그인하여 액세스 토큰을 획득합니다.
+            login_data = {"email": "test@example.com", "password": "test_password"}
+            res = await ac.post("/api/v1/users/login", json=login_data)
+
+            assert res.status_code == 200
+
+            token = res.json().get("access_token")
+            headers = {"Authorization": f"Bearer {token}"}
+
             # Product 데이터 생성
             product_test = await Product.create(
                 name="test_product",
@@ -97,7 +126,7 @@ class TestInspectionRouter(TestCase):
             data = {"product_id": product_test.id, "inspector": "inspector1", "inspection_count": 1}
 
             # POST 요청을 보내고 응답을 받음
-            response = await ac.post("/api/v1/inspection/", json=data)
+            response = await ac.post("/api/v1/inspection/", json=data, headers=headers)
 
             # 응답 상태 코드 확인
             assert response.status_code == 201
@@ -113,6 +142,16 @@ class TestInspectionRouter(TestCase):
         async with AsyncClient(app=app, base_url="http://test") as ac:
             test_user = await self.create_test_user()
             test_category = await self.create_test_category()
+
+            # 로그인하여 액세스 토큰을 획득합니다.
+            login_data = {"email": "test@example.com", "password": "test_password"}
+            res = await ac.post("/api/v1/users/login", json=login_data)
+
+            assert res.status_code == 200
+
+            token = res.json().get("access_token")
+            headers = {"Authorization": f"Bearer {token}"}
+
             product_test = await Product.create(
                 name="test_product",
                 content="test content",
@@ -128,7 +167,7 @@ class TestInspectionRouter(TestCase):
             await Inspection.create(inspector="inspector1", product_id=product_test.id, inspection_count=1)
 
             # GET 요청을 보내고 응답을 받음
-            response = await ac.get(f"/api/v1/inspection/product/{product_test.id}")
+            response = await ac.get(f"/api/v1/inspection/product/{product_test.id}", headers=headers)
 
             # 응답 상태 코드 확인
             assert response.status_code == 200
@@ -146,6 +185,16 @@ class TestInspectionRouter(TestCase):
         async with AsyncClient(app=app, base_url="http://test") as ac:
             test_user = await self.create_test_user()
             test_category = await self.create_test_category()
+
+            # 로그인하여 액세스 토큰을 획득합니다.
+            login_data = {"email": "test@example.com", "password": "test_password"}
+            res = await ac.post("/api/v1/users/login", json=login_data)
+
+            assert res.status_code == 200
+
+            token = res.json().get("access_token")
+            headers = {"Authorization": f"Bearer {token}"}
+
             product_test = await Product.create(
                 name="test_product",
                 content="test content",
@@ -161,7 +210,7 @@ class TestInspectionRouter(TestCase):
             inspection = await Inspection.create(inspector="inspector1", product_id=product_test.id, inspection_count=1)
 
             # GET 요청을 보내고 응답을 받음
-            response = await ac.get(f"/api/v1/inspection/{inspection.id}")
+            response = await ac.get(f"/api/v1/inspection/{inspection.id}", headers=headers)
 
             # 응답 상태 코드 확인
             assert response.status_code == 200
@@ -178,6 +227,16 @@ class TestInspectionRouter(TestCase):
         async with AsyncClient(app=app, base_url="http://test") as ac:
             test_user = await self.create_test_user()
             test_category = await self.create_test_category()
+
+            # 로그인하여 액세스 토큰을 획득합니다.
+            login_data = {"email": "test@example.com", "password": "test_password"}
+            res = await ac.post("/api/v1/users/login", json=login_data)
+
+            assert res.status_code == 200
+
+            token = res.json().get("access_token")
+            headers = {"Authorization": f"Bearer {token}"}
+
             product_test = await Product.create(
                 name="test_product",
                 content="test content",
@@ -196,7 +255,7 @@ class TestInspectionRouter(TestCase):
             data = {"inspector": "updated_inspector", "inspection_count": 2}
 
             # PUT 요청을 보내고 응답을 받음
-            response = await ac.put(f"/api/v1/inspection/{inspection.id}", json=data)
+            response = await ac.put(f"/api/v1/inspection/{inspection.id}", json=data, headers=headers)
 
             # 응답 상태 코드 확인
             assert response.status_code == 200
