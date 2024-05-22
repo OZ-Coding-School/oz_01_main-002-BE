@@ -1,19 +1,25 @@
 from httpx import AsyncClient
 from tortoise.contrib.test import TestCase
-
+from passlib.context import CryptContext  # type: ignore
+from typing import Any
 from app import app
 from app.models.terms import Terms
 from app.models.terms_agreements import TermsAgreement
 from app.models.users import User
 
+pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+
 
 class TestTermAgreementRouter(TestCase):
     @staticmethod
-    async def create_test_user() -> User:
+    def hash_password(password: str) -> Any:
+        return pwd_context.hash(password)
+
+    async def create_test_user(self) -> User:
         return await User.create(
             name="test_user",
-            email="gudqls0516@naver.com",
-            password="pw12345",
+            email="test@example.com",
+            password=self.hash_password("test_password"),
             gender="남",
             age=12,
             contact="test",
@@ -37,6 +43,15 @@ class TestTermAgreementRouter(TestCase):
             user_test = await self.create_test_user()
             term_test = await self.create_test_terms()
 
+            # 로그인하여 액세스 토큰을 획득합니다.
+            login_data = {"email": "test@example.com", "password": "test_password"}
+            res = await ac.post("/api/v1/users/login", json=login_data)
+
+            assert res.status_code == 200
+
+            token = res.json().get("access_token")
+            headers = {"Authorization": f"Bearer {token}"}
+
             await TermsAgreement.create(
                 user_id=user_test.id,
                 term_id=term_test.id,
@@ -45,7 +60,7 @@ class TestTermAgreementRouter(TestCase):
                 user_id=user_test.id,
                 term_id=term_test.id,
             )
-            response = await ac.get("/api/v1/terms_agreement/")
+            response = await ac.get("/api/v1/terms_agreement/", headers=headers)
 
             assert response.status_code == 200
             # then
@@ -63,9 +78,18 @@ class TestTermAgreementRouter(TestCase):
             user_test = await self.create_test_user()
             term_test = await self.create_test_terms()
 
+            # 로그인하여 액세스 토큰을 획득합니다.
+            login_data = {"email": "test@example.com", "password": "test_password"}
+            res = await ac.post("/api/v1/users/login", json=login_data)
+
+            assert res.status_code == 200
+
+            token = res.json().get("access_token")
+            headers = {"Authorization": f"Bearer {token}"}
+
             data = {
                 "user_id": user_test.id,
                 "term_id": term_test.id,
             }
-            response = await ac.post("/api/v1/terms_agreement/", json=data)
+            response = await ac.post("/api/v1/terms_agreement/", json=data, headers=headers)
             assert response.status_code == 201

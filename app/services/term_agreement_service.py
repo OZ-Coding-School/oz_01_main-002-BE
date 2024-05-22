@@ -24,17 +24,17 @@ async def service_get_all_by_terms_agreement() -> list[TermsAgreementGetResponse
     ]
 
 
-async def service_create_terms_agreement(request_data: TermsAgreementCreateResponse) -> None:
+async def service_create_terms_agreement(request_data: TermsAgreementCreateResponse, current_user: int) -> None:
     try:
         await Terms.get_by_terms_id(id=request_data.term_id)
     except DoesNotExist:
         raise HTTPException(status_code=404, detail="term 아이디 값이 없어여")
     try:
-        await User.get_by_user_id(user_id=request_data.user_id)
+        await User.get_by_user_id(user_id=current_user)
     except DoesNotExist:
         raise HTTPException(status_code=404, detail="user 아이디 값이 없어여")
 
-    terms_agreement = await TermsAgreement.create_by_terms_agreement(request_data)
+    terms_agreement = await TermsAgreement.create_by_terms_agreement(request_data, current_user)
 
     if terms_agreement:
         raise HTTPException(status_code=201, detail="terms_agreement 성공적으로 생성되었습니다.")
