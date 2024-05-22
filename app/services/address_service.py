@@ -47,15 +47,15 @@ async def service_get_by_address_id(address_id: int) -> AddressGetResponse:
     )
 
 
-async def service_create_address(request_data: AddressCreateResponse) -> None:
+async def service_create_address(request_data: AddressCreateResponse, current_user: int) -> None:
     try:
-        existing_main_address = await Address.filter(user_id=request_data.user_id, is_main=True).first()
+        existing_main_address = await Address.filter(user_id=current_user, is_main=True).first()
 
         if existing_main_address:
             existing_main_address.is_main = False
             await existing_main_address.save()
 
-        await Address.create_by_address(request_data)
+        await Address.create_by_address(request_data, current_user)
         raise HTTPException(status_code=201, detail="주소가 성공적으로 생성되었습니다.")
     except IntegrityError as e:
         # 데이터 검증 오류 또는 데이터 중복 오류 처리

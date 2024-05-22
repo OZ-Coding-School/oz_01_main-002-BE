@@ -6,10 +6,11 @@ from collections.abc import Mapping
 from datetime import datetime, timedelta, timezone
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
-from typing import Any
+from typing import Any, Optional
 
 import orjson
-from fastapi import HTTPException
+from fastapi import Depends, HTTPException
+from fastapi.security import OAuth2PasswordBearer
 from jose import JWTError, jwt  # type: ignore
 from tortoise.exceptions import DoesNotExist, IntegrityError
 
@@ -28,6 +29,8 @@ from app.dtos.user_response import (
 from app.models.users import User
 from app.services.term_agreement_service import service_create_terms_agreement
 from app.utils.redis_ import redis
+
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 
 
 def is_valid_email(email: str) -> bool:
@@ -268,3 +271,20 @@ async def service_check_token(request_data: TokenResponse) -> None:
             raise HTTPException(status_code=401, detail=str(e))
 
     raise HTTPException(status_code=401, detail="Invalid Token")
+
+
+# JWT 토큰을 검증하고 user_id를 반환하는 함수
+async def get_current_user(token: str = Depends(oauth2_scheme)) -> Optional[int]:
+    credentials_exception = HTTPException(
+        status_code=401,
+        detail="Could not validate credentials",
+        headers={"WWW-Authenticate": "Bearer"},
+    )
+    try:
+        payload = jwt.decode(token, settings.SECRET_KEY, algorithms=settings.ALGORITHM)
+        user_id: int = payload.get("sub")
+        if user_id is None:
+            raise credentials_exception
+        return user_id
+    except JWTError:
+        raise credentials_exception
