@@ -20,6 +20,7 @@ from app.dtos.terms_response import TermIDResponse
 from app.dtos.user_response import (
     SendVerificationCodeResponse,
     TokenResponse,
+    UserCoinCreateResponse,
     UserLoginResponse,
     UserSignUpResponse,
     VerifyContactResponse,
@@ -262,6 +263,10 @@ async def service_token_refresh(request_data: TokenResponse) -> dict[str, str]:
     raise HTTPException(status_code=401, detail="UNAUTHORIZED - Invalid Token")
 
 
+async def service_create_coin(request_data: UserCoinCreateResponse, current_user: int) -> None:
+    await User.update_by_user_coin(request_data, current_user)
+
+
 async def service_check_token(request_data: TokenResponse) -> None:
     if request_data.token_type == "access_token":
         try:
@@ -282,7 +287,7 @@ async def get_current_user(token: str = Depends(oauth2_scheme)) -> Optional[int]
     )
     try:
         payload = jwt.decode(token, settings.SECRET_KEY, algorithms=settings.ALGORITHM)
-        user_id: int = payload.get("sub")
+        user_id: Optional[int] = payload.get("sub")
         if user_id is None:
             raise credentials_exception
         return user_id

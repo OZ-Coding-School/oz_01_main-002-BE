@@ -1,11 +1,14 @@
+from datetime import datetime
 from fastapi import HTTPException
 from tortoise.exceptions import DoesNotExist, IntegrityError
 
 from app.dtos.payment_response import (
+    PaymentCreateGetResponse,
     PaymentCreateResponse,
     PaymentGetResponse,
     ProductBase,
 )
+from app.models.address import Address
 from app.models.payments import Payment
 from app.models.products import Product
 from app.models.users import User
@@ -31,31 +34,56 @@ async def service_get_by_payment(payment_id: int) -> PaymentGetResponse:
     )
 
 
-async def service_create_payment(request_data: PaymentCreateResponse, current_user: int) -> None:
+async def service_create_payment(request_data: PaymentCreateResponse, current_user: int) -> PaymentCreateGetResponse:
     try:
-        await User.get(id=current_user)
+        user = await User.get(id=current_user)
     except DoesNotExist:
-        raise HTTPException(status_code=404, detail="User 없습니다.")
+        raise HTTPException(status_code=404, detail="사용자를 찾을 수 없습니다")
 
-    for product_id in [product for product in request_data.product_ids]:
+    products = []  # 상품 객체를 저장할 리스트
+    total_product_amount = 0  # 상품 가격 합계 초기화
+
+    for product_id in request_data.product_ids:
         try:
-            await Product.get(id=product_id)
+            product = await Product.get(id=product_id)
+            products.append(ProductBase(id=product.id, name=product.name, bid_price=product.bid_price))
+            total_product_amount += product.bid_price
         except DoesNotExist:
-            raise HTTPException(status_code=404, detail=f"Product ID {product_id}이(가) 없습니다.")
+            raise HTTPException(status_code=404, detail=f"상품 ID {product_id}를 찾을 수 없습니다")
+
+    if user.coin < request_data.total_amount:
+        raise HTTPException(status_code=400, detail="코인 잔액이 부족합니다")
+
+    user.coin -= request_data.total_amount
+    await user.save()
 
     try:
-        # Todo  유저가 가지고있는 돈과 products돈 뺴줘서 업데이트 하기 추후에 넣을 예정
+        main_address = await Address.get_main_address_by_user_id(current_user)
+        if not main_address:
+            raise HTTPException(status_code=404, detail="주요 주소를 찾을 수 없습니다")
 
+        if total_product_amount != request_data.total_amount:
+            raise HTTPException(
+                status_code=400,
+                detail=f"상품 총 금액 합계와 요청된 총 금액이 일치하지 않습니다. (상품 총 금액 합계: {total_product_amount}, 요청된 총 금액: {request_data.total_amount})"
+            )
+
+        uuid = datetime.now().strftime("%Y%m%d%H%M%S%f")[:-3]
         payment = await Payment.create_by_payment(request_data, current_user)
-        if payment:
-            # 성공 메시지와 상태 코드 반환
-            raise HTTPException(status_code=201, detail="payment 성공적으로 생성되었습니다.")
-        else:
-            # 검수 생성 실패 시 HTTP 예외 발생
-            raise HTTPException(status_code=500, detail="payment 생성에 실패했습니다.")
+
+        return PaymentCreateGetResponse(
+            id=payment.id,
+            user_id=user.id,
+            products=products,
+            created_at=payment.created_at,
+            updated_at=payment.updated_at,
+            total_amount=payment.total_amount,
+            uuid=uuid,
+            receiver_name=user.name,
+            receiver_address=f"{main_address.address}, {main_address.detail_address}, {main_address.zip_code}",
+            user_coin=user.coin,
+        )
     except IntegrityError as e:
-        # 데이터베이스 무결성 오류 처리 (예: 중복 키, 외래 키 제약 조건 위반 등)
         raise HTTPException(status_code=400, detail=f"데이터베이스 오류: {str(e)}")
     except ValueError as e:
-        # 값 오류 처리 (예: 유효하지 않은 데이터 형식 등)
         raise HTTPException(status_code=400, detail=f"유효하지 않은 값: {str(e)}")

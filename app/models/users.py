@@ -4,7 +4,7 @@ from passlib.context import CryptContext  # type: ignore
 from tortoise import fields
 from tortoise.models import Model
 
-from app.dtos.user_response import UserSignUpResponse
+from app.dtos.user_response import UserCoinCreateResponse, UserSignUpResponse
 from app.models.common import Common
 
 
@@ -17,6 +17,7 @@ class User(Common, Model):
     contact = fields.CharField(max_length=15, unique=True)
     nickname = fields.CharField(max_length=30, unique=True)
     content = fields.TextField(default="나를 표현해주세요")
+    coin = fields.FloatField(default=0.0)
 
     class Meta:
         table = "users"
@@ -66,3 +67,9 @@ class User(Common, Model):
             return True
 
         return False
+
+    @classmethod
+    async def update_by_user_coin(cls, request_data: UserCoinCreateResponse, current_user: int) -> None:
+        user = await cls.get_by_user_id(current_user)
+        user.coin = request_data.coin
+        await user.save()

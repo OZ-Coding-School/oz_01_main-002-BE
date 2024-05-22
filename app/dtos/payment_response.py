@@ -11,7 +11,6 @@ class ProductBase(BaseModel):
 
 
 class PaymentBase(BaseModel):
-    user_id: int
     total_amount: float
 
 
@@ -24,3 +23,14 @@ class PaymentGetResponse(PaymentBase):
     created_at: datetime
     updated_at: datetime
     products: List[ProductBase]
+
+
+class PaymentCreateGetResponse(PaymentBase):
+    id: int
+    created_at: datetime
+    updated_at: datetime
+    products: List[ProductBase]
+    uuid: str
+    receiver_name: str
+    receiver_address: str
+    user_coin: float
