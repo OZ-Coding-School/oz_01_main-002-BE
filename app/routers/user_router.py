@@ -5,6 +5,7 @@ from app.dtos.user_response import (
     SendVerificationCodeResponse,
     TokenResponse,
     UserCoinCreateResponse,
+    UserGetProfileResponse,
     UserLoginResponse,
     UserSignUpResponse,
     VerifyContactResponse,
@@ -12,12 +13,14 @@ from app.dtos.user_response import (
     VerifyNicknameResponse,
 )
 from app.services.user_service import (
+    get_current_refresh,
     get_current_user,
     send_verification_email,
     service_check_token,
     service_code_authentication,
     service_contact_verification,
     service_create_coin,
+    service_get_user_detail,
     service_login,
     service_nickname_verification,
     service_signup,
@@ -61,8 +64,8 @@ async def login_response(request_data: UserLoginResponse, response: Response) ->
 
 
 @router.post("/refresh")
-async def refresh_token(request_data: TokenResponse) -> dict[str, str]:
-    return await service_token_refresh(request_data)
+async def refresh_token(current_refresh: str = Depends(get_current_refresh)) -> dict[str, str]:
+    return await service_token_refresh(current_refresh)
 
 
 @router.post("/check/token")
@@ -73,3 +76,8 @@ async def check_token(request_data: TokenResponse) -> None:
 @router.put("/coin")
 async def create_coin(request_data: UserCoinCreateResponse, current_user: int = Depends(get_current_user)) -> None:
     return await service_create_coin(request_data, current_user)
+
+
+@router.get("/")
+async def router_get_user_detail(current_user: int = Depends(get_current_user)) -> UserGetProfileResponse:
+    return await service_get_user_detail(current_user)

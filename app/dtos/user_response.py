@@ -14,7 +14,6 @@ class UserSignUpResponse(BaseModel):
 
 
 class SendVerificationCodeResponse(BaseModel):
-    name: str
     email: str
 
 
@@ -43,3 +42,15 @@ class TokenResponse(BaseModel):
 
 class UserCoinCreateResponse(BaseModel):
     coin: float
+
+
+class UserGetProfileResponse(BaseModel):
+    coin: float
+    content: str
+    address: str
+    name: str
+    email: str
+    gender: str
+    age: int
+    contact: str
+    nickname: str
