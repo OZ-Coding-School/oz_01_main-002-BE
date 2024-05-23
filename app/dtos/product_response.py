@@ -8,7 +8,6 @@ class ProductBase(BaseModel):
     content: Optional[str] = None
     bid_price: Optional[int] = None
     duration: Optional[int] = None
-    user_id: int
     status: Optional[str] = None
     modify: bool
     grade: str
