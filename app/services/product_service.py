@@ -1,18 +1,25 @@
 from fastapi import HTTPException
 from tortoise.exceptions import DoesNotExist
 
-from app.dtos.product_response import ProductCreate, ProductOut, ProductUpdate
+from app.dtos.product_response import (
+    ProductCreate,
+    ProductGetResponse,
+    ProductOut,
+    ProductUpdate,
+)
 from app.models.categories import Category
 from app.models.products import Product
 from app.models.users import User
 
 
-async def service_get_all_products() -> list[ProductOut]:
+async def service_get_all_products() -> list[ProductGetResponse]:
     try:
         products = await Product.get_all_by_products()
-        return [
-            ProductOut(
-                id=product.id,
+        products_out = []
+        for product in products:
+            category = await Category.get(id=product.category_id)
+
+            product_out = ProductGetResponse(
                 name=product.name,
                 content=product.content,
                 bid_price=product.bid_price,
@@ -20,18 +27,18 @@ async def service_get_all_products() -> list[ProductOut]:
                 status=product.status,
                 modify=product.modify,
                 grade=product.grade,
-                category_id=product.category_id,
-                user_id=product.user_id,
+                category=category.name,
+                is_approved=product.is_approved,
             )
-            for product in products
-        ]
+            products_out.append(product_out)
+        return products_out
     except DoesNotExist:
         raise HTTPException(status_code=404, detail="product not found")
 
 
-async def service_create_product(product_data: ProductCreate) -> ProductCreate:
+async def service_create_product(product_data: ProductCreate, current_user: int) -> ProductCreate:
     try:
-        await User.get_by_user_id(user_id=product_data.user_id)
+        await User.get_by_user_id(user_id=current_user)
     except DoesNotExist:
         raise HTTPException(status_code=404, detail="user_id not found")
 
@@ -67,16 +74,17 @@ async def service_get_by_product_id(product_id: int) -> ProductOut:
     raise HTTPException(status_code=404, detail="Product not found")
 
 
-async def service_get_products_by_user_id(user_id: int) -> list[ProductOut]:
+async def service_get_products_by_user_id(current_user: int) -> list[ProductGetResponse]:
     try:
-        await User.get_by_user_id(user_id=user_id)
+        await User.get_by_user_id(user_id=current_user)
     except DoesNotExist:
         raise HTTPException(status_code=404, detail="User not found")
 
-    products = await Product.get_by_user_id(user_id)
-    return [
-        ProductOut(
-            id=product.id,
+    products = await Product.get_by_user_id(current_user)
+    products_response = []
+    for product in products:
+        category = await Category.get(id=product.category_id)
+        product_response = ProductGetResponse(
             name=product.name,
             content=product.content,
             bid_price=product.bid_price,
@@ -84,11 +92,11 @@ async def service_get_products_by_user_id(user_id: int) -> list[ProductOut]:
             status=product.status,
             modify=product.modify,
             grade=product.grade,
-            category_id=product.category_id,
-            user_id=product.user_id,
+            category=category.name,
+            is_approved=product.is_approved,
         )
-        for product in products
-    ]
+        products_response.append(product_response)
+    return products_response
 
 
 async def service_get_products_by_category_id(category_id: int) -> list[ProductOut]:

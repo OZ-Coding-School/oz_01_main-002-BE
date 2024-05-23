@@ -9,10 +9,8 @@ from app.dtos.address_response import (
 from app.models.address import Address
 
 
-async def service_get_all_address() -> list[AddressGetResponse]:
-    addresses = await Address.get_all_by_address()
-    if len(addresses) == 0:
-        raise HTTPException(status_code=404, detail="주소를 찾을 수 없습니다.")
+async def service_get_all_address_user(current_user: int) -> list[AddressGetResponse]:
+    addresses = await Address.get_all_by_user_address(current_user)
     return [
         AddressGetResponse(
             id=address.id,

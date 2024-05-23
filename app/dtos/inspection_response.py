@@ -6,7 +6,6 @@ from pydantic import BaseModel
 class InspectionBase(BaseModel):
     inspector: str
     product_id: int
-    inspection_count: int
 
 
 class InspectionCreateResponse(InspectionBase):
@@ -21,4 +20,3 @@ class InspectionGetResponse(InspectionBase):
 
 class InspectionUpdateResponse(BaseModel):
     inspector: str
-    inspection_count: int
