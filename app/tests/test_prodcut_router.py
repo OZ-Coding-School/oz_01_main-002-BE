@@ -1,4 +1,7 @@
+from typing import Any
+
 from httpx import AsyncClient
+from passlib.context import CryptContext  # type: ignore
 from tortoise.contrib.test import TestCase
 
 from app import app
@@ -7,14 +10,19 @@ from app.models.categories import Category
 from app.models.products import Product
 from app.models.users import User
 
+pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+
 
 class TestProductRouter(TestCase):
     @staticmethod
-    async def create_test_user() -> User:
+    def hash_password(password: str) -> Any:
+        return pwd_context.hash(password)
+
+    async def create_test_user(self) -> User:
         return await User.create(
             name="test_user",
-            email="gudqls0516@naver.com",
-            password="pw12345",
+            email="test@example.com",
+            password=self.hash_password("test_password"),
             gender="남",
             age=12,
             contact="test",
@@ -28,8 +36,18 @@ class TestProductRouter(TestCase):
 
     async def test_create_product(self) -> None:
         async with AsyncClient(app=app, base_url="http://test") as ac:
-            test_user = await TestProductRouter.create_test_user()
-            test_category = await TestProductRouter.create_test_category()
+            test_user = await self.create_test_user()
+            test_category = await self.create_test_category()
+
+            # 로그인하여 액세스 토큰을 획득합니다.
+            login_data = {"email": "test@example.com", "password": "test_password"}
+            res = await ac.post("/api/v1/users/login", json=login_data)
+
+            assert res.status_code == 200
+
+            token = res.json().get("access_token")
+            headers = {"Authorization": f"Bearer {token}"}
+
             product_data = ProductCreate(
                 name="test_product",
                 content="test content",
@@ -41,14 +59,23 @@ class TestProductRouter(TestCase):
                 category_id=test_category.id,
                 user_id=test_user.id,
             )
-            response = await ac.post("/api/v1/products/", json=product_data.dict())
+            response = await ac.post("/api/v1/products/", json=product_data.dict(), headers=headers)
 
             assert response.status_code == 200
 
     async def test_get_all_products(self) -> None:
         async with AsyncClient(app=app, base_url="http://test") as ac:
-            test_user = await TestProductRouter.create_test_user()
-            test_category = await TestProductRouter.create_test_category()
+            test_user = await self.create_test_user()
+            test_category = await self.create_test_category()
+
+            # 로그인하여 액세스 토큰을 획득합니다.
+            login_data = {"email": "test@example.com", "password": "test_password"}
+            res = await ac.post("/api/v1/users/login", json=login_data)
+
+            assert res.status_code == 200
+
+            token = res.json().get("access_token")
+            headers = {"Authorization": f"Bearer {token}"}
 
             product_data1 = await Product.create(
                 name="test_product1",
@@ -73,33 +100,44 @@ class TestProductRouter(TestCase):
                 user_id=test_user.id,
             )
 
-            response = await ac.get("/api/v1/products/")
+            response = await ac.get("/api/v1/products/", headers=headers)
 
             assert response.status_code == 200
             response_data = response.json()
 
             self.assertEqual(len(response_data), 2)
 
-            assert response_data[0]["id"] == product_data1.id
             assert response_data[0]["name"] == product_data1.name
             assert response_data[0]["content"] == product_data1.content
             assert response_data[0]["bid_price"] == product_data1.bid_price
             assert response_data[0]["duration"] == product_data1.duration
             assert response_data[0]["status"] == product_data1.status
             assert response_data[0]["grade"] == product_data1.grade
+            assert response_data[0]["category"] == test_category.name
+            assert response_data[0]["is_approved"] == product_data1.is_approved
 
-            assert response_data[1]["id"] == product_data2.id
             assert response_data[1]["name"] == product_data2.name
             assert response_data[1]["content"] == product_data2.content
             assert response_data[1]["bid_price"] == product_data2.bid_price
             assert response_data[1]["duration"] == product_data2.duration
             assert response_data[1]["status"] == product_data2.status
             assert response_data[1]["grade"] == product_data2.grade
+            assert response_data[1]["category"] == test_category.name
+            assert response_data[1]["is_approved"] == product_data1.is_approved
 
     async def test_get_product_id(self) -> None:
         async with AsyncClient(app=app, base_url="http://test") as ac:
-            test_user = await TestProductRouter.create_test_user()
-            test_category = await TestProductRouter.create_test_category()
+            test_user = await self.create_test_user()
+            test_category = await self.create_test_category()
+
+            # 로그인하여 액세스 토큰을 획득합니다.
+            login_data = {"email": "test@example.com", "password": "test_password"}
+            res = await ac.post("/api/v1/users/login", json=login_data)
+
+            assert res.status_code == 200
+
+            token = res.json().get("access_token")
+            headers = {"Authorization": f"Bearer {token}"}
 
             product_data = await Product.create(
                 name="test_product1",
@@ -113,7 +151,7 @@ class TestProductRouter(TestCase):
                 user_id=test_user.id,
             )
 
-            response = await ac.get(f"/api/v1/products/{product_data.id}")
+            response = await ac.get(f"/api/v1/products/{product_data.id}", headers=headers)
 
             assert response.status_code == 200
             response_data = response.json()
@@ -128,8 +166,17 @@ class TestProductRouter(TestCase):
 
     async def test_get_products_by_user_id(self) -> None:
         async with AsyncClient(app=app, base_url="http://test") as ac:
-            test_user = await TestProductRouter.create_test_user()
-            test_category = await TestProductRouter.create_test_category()
+            test_user = await self.create_test_user()
+            test_category = await self.create_test_category()
+
+            # 로그인하여 액세스 토큰을 획득합니다.
+            login_data = {"email": "test@example.com", "password": "test_password"}
+            res = await ac.post("/api/v1/users/login", json=login_data)
+
+            assert res.status_code == 200
+
+            token = res.json().get("access_token")
+            headers = {"Authorization": f"Bearer {token}"}
 
             product_data1 = await Product.create(
                 name="test_product1",
@@ -154,14 +201,13 @@ class TestProductRouter(TestCase):
                 user_id=test_user.id,
             )
 
-            response = await ac.get(f"/api/v1/products/user/{test_user.id}")
+            response = await ac.get("/api/v1/products/user/", headers=headers)
 
             assert response.status_code == 200
             response_data = response.json()
 
             assert len(response_data) == 2
 
-            assert response_data[0]["id"] == product_data1.id
             assert response_data[0]["name"] == product_data1.name
             assert response_data[0]["content"] == product_data1.content
             assert response_data[0]["bid_price"] == product_data1.bid_price
@@ -169,7 +215,6 @@ class TestProductRouter(TestCase):
             assert response_data[0]["status"] == product_data1.status
             assert response_data[0]["grade"] == product_data1.grade
 
-            assert response_data[1]["id"] == product_data2.id
             assert response_data[1]["name"] == product_data2.name
             assert response_data[1]["content"] == product_data2.content
             assert response_data[1]["bid_price"] == product_data2.bid_price
@@ -179,8 +224,17 @@ class TestProductRouter(TestCase):
 
     async def test_get_products_by_category_id(self) -> None:
         async with AsyncClient(app=app, base_url="http://test") as ac:
-            test_user = await TestProductRouter.create_test_user()
-            test_category = await TestProductRouter.create_test_category()
+            test_user = await self.create_test_user()
+            test_category = await self.create_test_category()
+
+            # 로그인하여 액세스 토큰을 획득합니다.
+            login_data = {"email": "test@example.com", "password": "test_password"}
+            res = await ac.post("/api/v1/users/login", json=login_data)
+
+            assert res.status_code == 200
+
+            token = res.json().get("access_token")
+            headers = {"Authorization": f"Bearer {token}"}
 
             product_data1 = await Product.create(
                 name="test_product1",
@@ -205,14 +259,13 @@ class TestProductRouter(TestCase):
                 user_id=test_user.id,
             )
 
-            response = await ac.get(f"/api/v1/products/categories/{test_category.id}")
+            response = await ac.get(f"/api/v1/products/categories/{test_category.id}", headers=headers)
 
             assert response.status_code == 200
             response_data = response.json()
 
             assert len(response_data) == 2
 
-            assert response_data[0]["id"] == product_data1.id
             assert response_data[0]["name"] == product_data1.name
             assert response_data[0]["content"] == product_data1.content
             assert response_data[0]["bid_price"] == product_data1.bid_price
@@ -220,7 +273,6 @@ class TestProductRouter(TestCase):
             assert response_data[0]["status"] == product_data1.status
             assert response_data[0]["grade"] == product_data1.grade
 
-            assert response_data[1]["id"] == product_data2.id
             assert response_data[1]["name"] == product_data2.name
             assert response_data[1]["content"] == product_data2.content
             assert response_data[1]["bid_price"] == product_data2.bid_price
@@ -230,8 +282,17 @@ class TestProductRouter(TestCase):
 
     async def test_update_product(self) -> None:
         async with AsyncClient(app=app, base_url="http://test") as ac:
-            test_user = await TestProductRouter.create_test_user()
-            test_category = await TestProductRouter.create_test_category()
+            test_user = await self.create_test_user()
+            test_category = await self.create_test_category()
+
+            # 로그인하여 액세스 토큰을 획득합니다.
+            login_data = {"email": "test@example.com", "password": "test_password"}
+            res = await ac.post("/api/v1/users/login", json=login_data)
+
+            assert res.status_code == 200
+
+            token = res.json().get("access_token")
+            headers = {"Authorization": f"Bearer {token}"}
 
             product_data = await Product.create(
                 id=1,
@@ -256,7 +317,7 @@ class TestProductRouter(TestCase):
                 "category_id": test_category.id,
             }
 
-            response = await ac.put(f"/api/v1/products/{product_data.id}", json=update_product_data)
+            response = await ac.put(f"/api/v1/products/{product_data.id}", json=update_product_data, headers=headers)
 
             assert response.status_code == 200
             response_data = response.json()
@@ -269,8 +330,17 @@ class TestProductRouter(TestCase):
 
     async def test_delete_product(self) -> None:
         async with AsyncClient(app=app, base_url="http://test") as ac:
-            test_user = await TestProductRouter.create_test_user()
-            test_category = await TestProductRouter.create_test_category()
+            test_user = await self.create_test_user()
+            test_category = await self.create_test_category()
+
+            # 로그인하여 액세스 토큰을 획득합니다.
+            login_data = {"email": "test@example.com", "password": "test_password"}
+            res = await ac.post("/api/v1/users/login", json=login_data)
+
+            assert res.status_code == 200
+
+            token = res.json().get("access_token")
+            headers = {"Authorization": f"Bearer {token}"}
 
             product_data = await Product.create(
                 name="test_product",
@@ -284,6 +354,6 @@ class TestProductRouter(TestCase):
                 user_id=test_user.id,
             )
 
-            response = await ac.delete(f"/api/v1/products/{product_data.id}")
+            response = await ac.delete(f"/api/v1/products/{product_data.id}", headers=headers)
 
             assert response.status_code == 200

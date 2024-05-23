@@ -193,7 +193,7 @@ def create_access_token(data: Mapping[str, str | float], expires_delta: timedelt
     if expires_delta:
         expire = datetime.now(timezone.utc) + expires_delta
     else:
-        expire = datetime.now(timezone.utc) + timedelta(minutes=5)
+        expire = datetime.now(timezone.utc) + timedelta(days=1)
     to_encode.update({"exp": expire.timestamp()})
     access_token = jwt.encode(to_encode, settings.SECRET_KEY, algorithm=settings.ALGORITHM)
     return access_token

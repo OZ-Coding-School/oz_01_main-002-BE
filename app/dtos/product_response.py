@@ -33,3 +33,15 @@ class ProductOut(ProductBase):
     modify: bool
     grade: str
     category_id: int
+
+
+class ProductGetResponse(BaseModel):
+    name: str
+    content: str
+    bid_price: int
+    duration: int
+    status: str
+    modify: bool
+    grade: str
+    category: str
+    is_approved: bool
