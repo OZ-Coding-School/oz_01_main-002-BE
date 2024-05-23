@@ -35,6 +35,7 @@ class ProductOut(ProductBase):
 
 
 class ProductGetResponse(BaseModel):
+    id: int
     name: str
     content: str
     bid_price: int

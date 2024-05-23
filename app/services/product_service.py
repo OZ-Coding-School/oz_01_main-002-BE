@@ -20,6 +20,7 @@ async def service_get_all_products() -> list[ProductGetResponse]:
             category = await Category.get(id=product.category_id)
 
             product_out = ProductGetResponse(
+                id=product.id,
                 name=product.name,
                 content=product.content,
                 bid_price=product.bid_price,
@@ -85,6 +86,7 @@ async def service_get_products_by_user_id(current_user: int) -> list[ProductGetR
     for product in products:
         category = await Category.get(id=product.category_id)
         product_response = ProductGetResponse(
+            id=product.id,
             name=product.name,
             content=product.content,
             bid_price=product.bid_price,
