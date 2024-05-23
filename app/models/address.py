@@ -25,8 +25,8 @@ class Address(Common, Model):
         table = "address"
 
     @classmethod
-    async def get_all_by_address(cls) -> list[Address]:
-        return await cls.all()
+    async def get_all_by_user_address(cls, user_id: int) -> list[Address]:
+        return await cls.filter(user_id=user_id).all()
 
     @classmethod
     async def get_by_address_id(cls, address_id: int) -> Optional[Address]:

@@ -72,8 +72,8 @@ class TestInspectionRouter(TestCase):
                 user_id=test_user.id,
             )
             # Inspection 데이터 생성
-            await Inspection.create(inspector="inspector1", product_id=product_test.id, inspection_count=1)
-            await Inspection.create(inspector="inspector2", product_id=product_test1.id, inspection_count=2)
+            await Inspection.create(inspector="inspector1", product_id=product_test.id)
+            await Inspection.create(inspector="inspector2", product_id=product_test1.id)
 
             # GET 요청을 보내고 응답을 받음
             response = await ac.get("/api/v1/inspection/", headers=headers)
@@ -88,11 +88,9 @@ class TestInspectionRouter(TestCase):
             # 응답 데이터의 내용 검증
             assert response_data[0]["inspector"] == "inspector1"
             assert response_data[0]["product_id"] == product_test.id
-            assert response_data[0]["inspection_count"] == 1
 
             assert response_data[1]["inspector"] == "inspector2"
             assert response_data[1]["product_id"] == product_test1.id
-            assert response_data[1]["inspection_count"] == 2
 
     # Test case for creating an inspection
     async def test_router_create_inspection(self) -> None:
@@ -123,7 +121,7 @@ class TestInspectionRouter(TestCase):
             )
 
             # POST 요청에 사용될 데이터
-            data = {"product_id": product_test.id, "inspector": "inspector1", "inspection_count": 1}
+            data = {"product_id": product_test.id, "inspector": "inspector1"}
 
             # POST 요청을 보내고 응답을 받음
             response = await ac.post("/api/v1/inspection/", json=data, headers=headers)
@@ -136,7 +134,6 @@ class TestInspectionRouter(TestCase):
             assert inspection is not None
             assert inspection.inspector == "inspector1"
             assert inspection.product_id == product_test.id
-            assert inspection.inspection_count == 1
 
     async def test_router_get_detail_inspection(self) -> None:
         async with AsyncClient(app=app, base_url="http://test") as ac:
@@ -164,7 +161,7 @@ class TestInspectionRouter(TestCase):
                 user_id=test_user.id,
             )
             # Inspection 데이터 생성
-            await Inspection.create(inspector="inspector1", product_id=product_test.id, inspection_count=1)
+            await Inspection.create(inspector="inspector1", product_id=product_test.id)
 
             # GET 요청을 보내고 응답을 받음
             response = await ac.get(f"/api/v1/inspection/product/{product_test.id}", headers=headers)
@@ -179,7 +176,6 @@ class TestInspectionRouter(TestCase):
             # 응답 데이터의 내용 검증
             assert response_data[0]["inspector"] == "inspector1"
             assert response_data[0]["product_id"] == product_test.id
-            assert response_data[0]["inspection_count"] == 1
 
     async def test_router_get_one_inspection(self) -> None:
         async with AsyncClient(app=app, base_url="http://test") as ac:
@@ -207,7 +203,7 @@ class TestInspectionRouter(TestCase):
                 user_id=test_user.id,
             )
             # Inspection 데이터 생성
-            inspection = await Inspection.create(inspector="inspector1", product_id=product_test.id, inspection_count=1)
+            inspection = await Inspection.create(inspector="inspector1", product_id=product_test.id)
 
             # GET 요청을 보내고 응답을 받음
             response = await ac.get(f"/api/v1/inspection/{inspection.id}", headers=headers)
@@ -221,7 +217,6 @@ class TestInspectionRouter(TestCase):
             # 응답 데이터의 내용 검증
             assert response_data["inspector"] == "inspector1"
             assert response_data["product_id"] == product_test.id
-            assert response_data["inspection_count"] == 1
 
     async def test_router_update_inspection(self) -> None:
         async with AsyncClient(app=app, base_url="http://test") as ac:
@@ -249,10 +244,10 @@ class TestInspectionRouter(TestCase):
                 user_id=test_user.id,
             )
             # Inspection 데이터 생성
-            inspection = await Inspection.create(inspector="inspector1", product_id=product_test.id, inspection_count=1)
+            inspection = await Inspection.create(inspector="inspector1", product_id=product_test.id)
 
             # PUT 요청에 사용될 데이터
-            data = {"inspector": "updated_inspector", "inspection_count": 2}
+            data = {"inspector": "updated_inspector"}
 
             # PUT 요청을 보내고 응답을 받음
             response = await ac.put(f"/api/v1/inspection/{inspection.id}", json=data, headers=headers)

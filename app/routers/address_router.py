@@ -8,7 +8,7 @@ from app.dtos.address_response import (
 from app.services.address_service import (
     service_create_address,
     service_delete_address,
-    service_get_all_address,
+    service_get_all_address_user,
     service_get_by_address_id,
     service_update_address,
 )
@@ -18,8 +18,8 @@ router = APIRouter(prefix="/api/v1/address", tags=["address"], redirect_slashes=
 
 
 @router.get("/", response_model=list[AddressGetResponse])
-async def router_get_all_address(_: int = Depends(get_current_user)) -> list[AddressGetResponse]:
-    return await service_get_all_address()
+async def router_get_all_address_user(current_user: int = Depends(get_current_user)) -> list[AddressGetResponse]:
+    return await service_get_all_address_user(current_user)
 
 
 @router.post("/", response_model=AddressCreateResponse)
