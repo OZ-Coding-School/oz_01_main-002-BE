@@ -16,7 +16,6 @@ TORTOISE_APP_MODELS = [
     "app.models.chat",
     "app.models.carries",
     "app.models.payments",
-    "app.models.auction",
 ]
 
 TORTOISE_ORM = {
