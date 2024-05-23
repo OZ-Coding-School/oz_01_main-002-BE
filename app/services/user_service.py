@@ -21,15 +21,15 @@ from app.dtos.user_response import (
     SendVerificationCodeResponse,
     TokenResponse,
     UserCoinCreateResponse,
+    UserGetProfileResponse,
     UserLoginResponse,
     UserSignUpResponse,
     VerifyContactResponse,
     VerifyEmailResponse,
     VerifyNicknameResponse,
-    UserGetProfileResponse
 )
-from app.models.users import User
 from app.models.address import Address
+from app.models.users import User
 from app.services.term_agreement_service import service_create_terms_agreement
 from app.utils.redis_ import redis
 
@@ -245,9 +245,7 @@ async def service_login(
 async def service_token_refresh(current_refresh: str) -> dict[str, str]:
     user_token = jwt.decode(current_refresh, settings.SECRET_KEY, algorithms=settings.ALGORITHM)
     user_id = user_token["sub"].split("-")[1]
-    server_token = jwt.decode(
-        await redis.get(f"user:{user_id}"), settings.SECRET_KEY, algorithms=settings.ALGORITHM
-    )
+    server_token = jwt.decode(await redis.get(f"user:{user_id}"), settings.SECRET_KEY, algorithms=settings.ALGORITHM)
     server_id = server_token["sub"].split("-")[1]
 
     if user_id == server_id:
