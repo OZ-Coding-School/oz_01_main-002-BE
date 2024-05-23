@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Chat</title>
+</head>
+<body>
+<h1>WebSocket Chat</h1>
+<form onsubmit="return false;">
+    <!--WSconnection UI-->
+    <label>User ID: <input type="text" id="userIdText" autocomplete="off"/></label>
+    <button onclick="connectToWS()">Connect</button>
+    <br>
+    <span id="connectionInfo"></span>
+    <hr>
+
+    <!-- Connect to Room -->
+    <label>Room ID: <input type="text" id="connectRoomIdText" autocomplete="off"/></label>
+    <button onclick="listenToRoom()">Listen to Room</button>
+    <br>
+    <span id="connectRoomInfo" style="color: red"></span>
+    <hr>
+
+    <!-- Send message-->
+    <label>Message: <input type="text" id="messageText" autocomplete="off"/></label>
+    <br>
+    <label>Room ID: <input type="text" id="roomIDMessageText" autocomplete="off"/></label>
+    <br>
+    <span id="sendMessageInfo" style="color: red"></span>
+    <br>
+    <br>
+    <button onclick="sendMessage()">Send message To Room</button>
+</form>
+<ul id='messages'></ul>
+<script>
+    var ws = null
+    var userId = null
+
+    function connectToWS() {
+        var userIdField = document.getElementById("userIdText")
+        var connectionInfoSpan = document.getElementById("connectionInfo")
+
+        if (userIdField.value.length == 0) {
+            // The String is empty
+            connectionInfoSpan.innerHTML = "Please input User Unique id"
+            connectionInfoSpan.style.color = "red"
+            return;
+        }
+
+        userId = Number(userIdField.value);
+        connectionInfoSpan.innerHTML = "Connecting..."
+        connectionInfoSpan.style.color = "black"
+        console.log(userId);
+        //The user Id was gotten
+        //Initiate the connection
+        let wsUrl = "ws://localhost:8000/api/v1/chat/ws/" + userId
+        ws = new WebSocket(wsUrl);
+
+        ws.onopen = function (event) {
+            connectionInfoSpan.innerHTML = "Connection Made Successfully!"
+            connectionInfoSpan.style.color = "green"
+        };
+
+        ws.onmessage = function (event) {
+            var messages = document.getElementById('messages')
+            var message = document.createElement('li')
+            var content = document.createTextNode(event.data)
+            message.appendChild(content)
+            messages.appendChild(message)
+        };
+
+        ws.onclose = function (event) {
+            connectionInfoSpan.innerHTML = "WebSocket Connection Closed!"
+            connectionInfoSpan.style.color = "red"
+        };
+    }
+
+    async function listenToRoom() {
+        var roomIdField = document.getElementById("connectRoomIdText")
+        var userIdText = document.getElementById("userIdText")
+
+        var connectRoomInfoSpan = document.getElementById("connectRoomInfo")
+
+        if (roomIdField.value.length == 0) {
+            connectRoomInfoSpan.innerHTML = "Please Enter the room Id"
+            return;
+        }
+
+        if(userId == null){
+            connectRoomInfoSpan.innerHTML = "User Id not Set"
+            return;
+        }
+
+        //The whole data has now been gotten, Make the request now
+
+        response = await fetch("/api/v1/chat/register_to_room/", {
+            method: "POST",
+            body: JSON.stringify({
+                user_id: userIdText.value,
+                room_id: roomIdField.value,
+            }),
+            headers: {
+                "Content-type": "application/json; charset=UTF-8"
+            }
+        });
+
+        if(!response.ok){
+            connectRoomInfoSpan.innerHTML = "Error Joining Room"
+            return;
+        }
+
+        res = await response.json()
+
+        connectRoomInfoSpan.innerHTML = "Room Joined Successfully!"
+        connectRoomInfoSpan.style.color = "green"
+    }
+
+    function sendMessage() {
+        var input = document.getElementById("messageText")
+        var roomId = document.getElementById("roomIDMessageText")
+        var sendMessageInfo = document.getElementById("sendMessageInfo")
+
+        if(roomId.value.length == 0){
+            sendMessageInfo.innerHTML = "Please Enter the room Id"
+            return;
+        }
+
+        if(input.value.length == 0){
+            sendMessageInfo.innerHTML = "Please enter a valid Message"
+            return;
+        }
+
+        if(ws == null){
+            sendMessageInfo.innerHTML = "No Connection Made"
+            return;
+        }
+
+        var message = {
+            room_id: roomId.value,
+            message: input.value,
+            user_id: userId,
+        }
+
+        ws.send(JSON.stringify(message))
+
+        input.value = ''
+        sendMessageInfo.innerHTML = ""
+    }
+</script>
+</body>
+</html>

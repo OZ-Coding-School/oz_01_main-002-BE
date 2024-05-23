@@ -1,0 +1,70 @@
+name: Continuous Integration
+
+on:
+  push:
+
+env:
+  PYTHON_VERSION: "3.12"
+  POETRY_VERSION: "1.8.2"
+  POETRY_URL: https://install.python-poetry.org
+  DB_HOST: 127.0.0.1
+  DB_PORT: 3306
+  DB_USER: root
+  DB_PASSWORD: 1234
+  DB_DATABASE: oz_django
+
+jobs:
+  CI:
+    runs-on: ubuntu-20.04
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python ${{ env.PYTHON_VERSION }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+        id: setup-python
+
+      - name: Set timezone to KST
+        run: |
+          sudo rm /etc/localtime
+          sudo ln -s /usr/share/zoneinfo/Asia/Seoul /etc/localtime
+
+      - name: Start Mysql
+        run: |
+          sudo systemctl start mysql
+          mysql -e "use mysql; FLUSH PRIVILEGES; ALTER USER '${{ env.DB_USER }}'@'localhost' IDENTIFIED BY '${{ env.DB_PASSWORD }}';" -uroot -proot
+          mysql -e 'CREATE DATABASE ${{ env.DB_DATABASE }};' -u${{ env.DB_USER }} -p${{ env.DB_PASSWORD }}
+
+      - name: Cache Poetry cache
+        uses: actions/cache@v3
+        with:
+          path: ~/.cache/pypoetry
+          key: poetry-cache-${{ runner.os }}-${{ steps.setup-python.outputs.python-version }}-${{ env.POETRY_VERSION }}
+
+      - name: Cache Packages
+        uses: actions/cache@v3
+        with:
+          path: ~/.local
+          key: poetry-local-${{ runner.os }}-${{ steps.setup-python.outputs.python-version }}-${{ hashFiles('**/poetry.lock') }}
+
+      - name: Install Poetry ${{ env.POETRY_VERSION }}
+        run: |
+          curl -sSL ${{ env.POETRY_URL }} | python - --version ${{ env.POETRY_VERSION }}
+          echo "$HOME/.local/bin" >> $GITHUB_PATH
+
+      - name: Install Dependencies
+        run: poetry install
+
+      - name: Run black
+        run: |
+          poetry run black . --check
+
+      - name: Run isort
+        run: |
+          poetry run isort . --check --diff
+
+      - name: Run mypy
+        run: |
+          poetry run mypy .

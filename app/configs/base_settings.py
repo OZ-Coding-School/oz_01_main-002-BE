@@ -16,3 +16,8 @@ class Settings(BaseSettings):
     DB_USER: str = "root"
     DB_PASSWORD: str = ""
     DB_DB: str = ""
+    GMAIL_USERNAME: str = ""
+    GMAIL_PASSWORD: str = ""
+    REDIS_URL: str = ""
+    SECRET_KEY: str = ""
+    ALGORITHM: str = ""

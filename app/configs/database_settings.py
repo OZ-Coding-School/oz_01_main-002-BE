@@ -6,6 +6,16 @@ from app.configs import settings
 
 TORTOISE_APP_MODELS = [
     "aerich.models",
+    "app.models.terms",
+    "app.models.products",
+    "app.models.users",
+    "app.models.inspections",
+    "app.models.terms_agreements",
+    "app.models.address",
+    "app.models.categories",
+    "app.models.chat",
+    "app.models.carries",
+    "app.models.payments",
 ]
 
 TORTOISE_ORM = {
