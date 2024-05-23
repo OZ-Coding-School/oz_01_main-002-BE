@@ -42,13 +42,13 @@ async def service_create_product(product_data: ProductCreate, current_user: int)
     except DoesNotExist:
         raise HTTPException(status_code=404, detail="user_id not found")
 
-    product = await Product.create_by_product(product_data)
+    product = await Product.create_by_product(product_data, current_user)
     return ProductCreate(
         name=product.name,
         content=product.content,
         bid_price=product.bid_price,
         duration=product.duration,
-        user_id=product.user_id,
+        user_id=current_user,
         status=product.status,
         modify=product.modify,
         grade=product.grade,

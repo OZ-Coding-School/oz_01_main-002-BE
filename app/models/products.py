@@ -35,9 +35,8 @@ class Product(Common, Model):
         return await cls.all()
 
     @classmethod
-    async def create_by_product(cls, product_data: ProductCreate) -> Product:
+    async def create_by_product(cls, product_data: ProductCreate, current_user: int) -> Product:
         return await cls.create(
-            user_id=product_data.user_id,
             name=product_data.name,
             content=product_data.content,
             bid_price=product_data.bid_price,
@@ -46,6 +45,7 @@ class Product(Common, Model):
             modify=product_data.modify,
             grade=product_data.grade,
             category_id=product_data.category_id,
+            user_id=current_user,
         )
 
     @classmethod
