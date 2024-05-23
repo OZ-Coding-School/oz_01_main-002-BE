@@ -24,9 +24,9 @@ async def register_user_to_room(body: MessageToRoomBaseResponse, current_user: i
     await service_register_user_to_room(body, current_user)
 
 
-@router.websocket("/ws/")
-async def websocket_endpoint(websocket: WebSocket, current_user: int = Depends(get_current_user)) -> None:
-    await service_websocket_endpoint(current_user, websocket)
+@router.websocket("/ws/{user_id}")
+async def websocket_endpoint(user_id: int, websocket: WebSocket) -> None:
+    await service_websocket_endpoint(user_id, websocket)
 
 
 # 채팅방 나가는 로직 짤 예정
