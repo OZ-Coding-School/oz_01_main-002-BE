@@ -6,7 +6,7 @@ from collections.abc import Mapping
 from datetime import datetime, timedelta, timezone
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
-from typing import Any, Optional
+from typing import Any
 
 import orjson
 from fastapi import Depends, HTTPException
@@ -26,8 +26,10 @@ from app.dtos.user_response import (
     VerifyContactResponse,
     VerifyEmailResponse,
     VerifyNicknameResponse,
+    UserGetProfileResponse
 )
 from app.models.users import User
+from app.models.address import Address
 from app.services.term_agreement_service import service_create_terms_agreement
 from app.utils.redis_ import redis
 
@@ -64,7 +66,7 @@ async def send_verification_email(request_data: SendVerificationCodeResponse) ->
     try:
         verification_code = generate_verification_code()
         email_content = f"""
-        안녕하세요 {request_data.name}님! 우리동네 경매장 입니다!
+        안녕하세요 우리동네 경매장 입니다!
         
         본 이메일은 자사 서비스를 사용하기 위한 필수 사항입니다.
         
@@ -148,10 +150,6 @@ async def service_nickname_verification(request_data: VerifyNicknameResponse) ->
 
 async def service_contact_verification(request_data: VerifyContactResponse) -> None:
     try:
-        integer_contact = ",".join(request_data.contact.split("-"))
-        if not integer_contact.isdigit():
-            raise HTTPException(status_code=400, detail="Bad Request - Contact must integer without '-' ")
-
         if not is_valid_contact(request_data.contact):
             raise HTTPException(status_code=400, detail="Bad Request - Invalid Contact")
 
@@ -233,7 +231,7 @@ async def service_login(
         pass
 
     access_token_data = {"sub": str(user_data.id), "email": user_data.email}
-    refresh_token_data = {"sub": "re-" + str(user_data.id) + "-er", "email": user_data.email}
+    refresh_token_data = {"sub": "re-" + str(user_data.id) + "-er", "type": "refresh"}
 
     access_token = create_access_token(data=access_token_data, expires_delta=timedelta(minutes=5))
     refresh_token = create_refresh_token(data=refresh_token_data, expires_delta=timedelta(days=1))
@@ -244,21 +242,20 @@ async def service_login(
     return {"user": str(user_data.id), "access_token": access_token}, refresh_token
 
 
-async def service_token_refresh(request_data: TokenResponse) -> dict[str, str]:
-    if request_data.token_type == "refresh_token":
-        user_token = jwt.decode(request_data.token, settings.SECRET_KEY, algorithms=settings.ALGORITHM)
-        user_id = user_token["sub"].split("-")[1]
-        server_token = jwt.decode(
-            await redis.get(f"user:{user_id}"), settings.SECRET_KEY, algorithms=settings.ALGORITHM
-        )
-        server_id = server_token["sub"].split("-")[1]
+async def service_token_refresh(current_refresh: str) -> dict[str, str]:
+    user_token = jwt.decode(current_refresh, settings.SECRET_KEY, algorithms=settings.ALGORITHM)
+    user_id = user_token["sub"].split("-")[1]
+    server_token = jwt.decode(
+        await redis.get(f"user:{user_id}"), settings.SECRET_KEY, algorithms=settings.ALGORITHM
+    )
+    server_id = server_token["sub"].split("-")[1]
 
-        if user_id == server_id:
-            user_data = await User.get(id=server_token["sub"].split("-")[1])
-            access_token_data = {"sub": str(user_data.id), "email": user_data.email}
-            access_token = create_access_token(data=access_token_data, expires_delta=timedelta(minutes=5))
+    if user_id == server_id:
+        user_data = await User.get(id=server_token["sub"].split("-")[1])
+        access_token_data = {"sub": str(user_data.id), "email": user_data.email}
+        access_token = create_access_token(data=access_token_data, expires_delta=timedelta(minutes=5))
 
-            return {"user": str(user_data.id), "access_token": access_token}
+        return {"user": str(user_data.id), "access_token": access_token}
 
     raise HTTPException(status_code=401, detail="UNAUTHORIZED - Invalid Token")
 
@@ -279,7 +276,7 @@ async def service_check_token(request_data: TokenResponse) -> None:
 
 
 # JWT 토큰을 검증하고 user_id를 반환하는 함수
-async def get_current_user(token: str = Depends(oauth2_scheme)) -> Optional[int]:
+async def get_current_user(token: str = Depends(oauth2_scheme)) -> int:
     credentials_exception = HTTPException(
         status_code=401,
         detail="Could not validate credentials",
@@ -287,9 +284,43 @@ async def get_current_user(token: str = Depends(oauth2_scheme)) -> Optional[int]
     )
     try:
         payload = jwt.decode(token, settings.SECRET_KEY, algorithms=settings.ALGORITHM)
-        user_id: Optional[int] = payload.get("sub")
+        user_id: int = payload.get("sub")
         if user_id is None:
             raise credentials_exception
         return user_id
     except JWTError:
         raise credentials_exception
+
+
+async def get_current_refresh(token: str = Depends(oauth2_scheme)) -> str:
+    credentials_exception = HTTPException(
+        status_code=401,
+        detail="Could not validate credentials",
+        headers={"WWW-Authenticate": "Bearer"},
+    )
+    try:
+        payload = jwt.decode(token, settings.SECRET_KEY, algorithms=settings.ALGORITHM)
+        payload.get("type")
+        return token
+    except JWTError:
+        raise credentials_exception
+
+
+async def service_get_user_detail(current_user: int) -> UserGetProfileResponse:
+    user = await User.get_by_user_id(current_user)
+    if not user:
+        raise HTTPException(status_code=404, detail="Not Found - User not found")
+    main_address = await Address.get_main_address_by_user_id(current_user)
+    return UserGetProfileResponse(
+        email=user.email,
+        name=user.name,
+        nickname=user.nickname,
+        contact=user.contact,
+        coin=user.coin,
+        created_at=user.created_at,
+        updated_at=user.updated_at,
+        gender=user.gender,
+        age=user.age,
+        content=user.content,
+        address=f"{main_address.address} {main_address.detail_address}" if main_address else "",
+    )
