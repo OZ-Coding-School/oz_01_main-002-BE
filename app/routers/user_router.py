@@ -1,9 +1,10 @@
-from fastapi import APIRouter, Response
+from fastapi import APIRouter, Depends, Response
 
 from app.dtos.terms_response import TermIDResponse
 from app.dtos.user_response import (
     SendVerificationCodeResponse,
     TokenResponse,
+    UserCoinCreateResponse,
     UserLoginResponse,
     UserSignUpResponse,
     VerifyContactResponse,
@@ -11,10 +12,12 @@ from app.dtos.user_response import (
     VerifyNicknameResponse,
 )
 from app.services.user_service import (
+    get_current_user,
     send_verification_email,
     service_check_token,
     service_code_authentication,
     service_contact_verification,
+    service_create_coin,
     service_login,
     service_nickname_verification,
     service_signup,
@@ -65,3 +68,8 @@ async def refresh_token(request_data: TokenResponse) -> dict[str, str]:
 @router.post("/check/token")
 async def check_token(request_data: TokenResponse) -> None:
     return await service_check_token(request_data)
+
+
+@router.put("/coin")
+async def create_coin(request_data: UserCoinCreateResponse, current_user: int = Depends(get_current_user)) -> None:
+    return await service_create_coin(request_data, current_user)

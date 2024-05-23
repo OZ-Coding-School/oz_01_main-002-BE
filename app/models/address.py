@@ -61,3 +61,7 @@ class Address(Common, Model):
     async def delete_by_address(cls, address_id: int) -> None:
         address = await cls.filter(id=address_id).get()
         await address.delete()
+
+    @classmethod
+    async def get_main_address_by_user_id(cls, user_id: int) -> Optional[Address]:
+        return await cls.get_or_none(user_id=user_id, is_main=True)
