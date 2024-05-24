@@ -4,7 +4,11 @@ from passlib.context import CryptContext  # type: ignore
 from tortoise import fields
 from tortoise.models import Model
 
-from app.dtos.user_response import UserCoinCreateResponse, UserSignUpResponse
+from app.dtos.user_response import (
+    UserCoinCreateResponse,
+    UserSignUpResponse,
+    UserUpdateProfileResponse,
+)
 from app.models.common import Common
 
 
@@ -73,3 +77,17 @@ class User(Common, Model):
         user = await cls.get_by_user_id(current_user)
         user.coin = request_data.coin
         await user.save()
+
+    @classmethod
+    async def update_by_user(cls, request_data: UserUpdateProfileResponse, current_user: int) -> User:
+        user = await cls.get_by_user_id(current_user)
+
+        # request_data에서 unset(설정되지 않은) 필드를 제외하고, dictionary로 변환
+        update_data = request_data.dict(exclude_unset=True)
+
+        # update_data에 있는 각 키와 값을 이용하여, 주소 정보를 업데이트
+        for key, value in update_data.items():
+            setattr(user, key, value)  # 객체의 속성을 업데이트
+
+        await user.save()
+        return user
