@@ -33,3 +33,5 @@ class ProductOut(ProductBase):
     modify: bool
     grade: str
     category_id: int
+    category_name: str
+    is_approved: bool

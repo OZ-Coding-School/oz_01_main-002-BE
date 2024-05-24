@@ -39,6 +39,7 @@ class TestProductRouter(TestCase):
                 status="1",
                 grade="상",
                 category_id=test_category.id,
+                category_name=test_category.name,
                 user_id=test_user.id,
             )
             response = await ac.post("/api/v1/products/", json=product_data.dict())
@@ -87,6 +88,7 @@ class TestProductRouter(TestCase):
             assert response_data[0]["duration"] == product_data1.duration
             assert response_data[0]["status"] == product_data1.status
             assert response_data[0]["grade"] == product_data1.grade
+            assert response_data[0]["category_name"] == test_category.name
 
             assert response_data[1]["id"] == product_data2.id
             assert response_data[1]["name"] == product_data2.name
@@ -95,6 +97,7 @@ class TestProductRouter(TestCase):
             assert response_data[1]["duration"] == product_data2.duration
             assert response_data[1]["status"] == product_data2.status
             assert response_data[1]["grade"] == product_data2.grade
+            assert response_data[1]["category_name"] == test_category.name
 
     async def test_get_product_id(self) -> None:
         async with AsyncClient(app=app, base_url="http://test") as ac:
@@ -110,6 +113,7 @@ class TestProductRouter(TestCase):
                 status="1",
                 grade="상",
                 category_id=test_category.id,
+                category_name=test_category.name,
                 user_id=test_user.id,
             )
 
@@ -140,6 +144,7 @@ class TestProductRouter(TestCase):
                 status="1",
                 grade="상",
                 category_id=test_category.id,
+                category_name=test_category.name,
                 user_id=test_user.id,
             )
             product_data2 = await Product.create(
@@ -151,6 +156,7 @@ class TestProductRouter(TestCase):
                 status="2",
                 grade="중",
                 category_id=test_category.id,
+                category_name=test_category.name,
                 user_id=test_user.id,
             )
 
@@ -191,6 +197,7 @@ class TestProductRouter(TestCase):
                 status="1",
                 grade="상",
                 category_id=test_category.id,
+                category_name=test_category.name,
                 user_id=test_user.id,
             )
             product_data2 = await Product.create(
@@ -202,6 +209,7 @@ class TestProductRouter(TestCase):
                 status="2",
                 grade="중",
                 category_id=test_category.id,
+                category_name=test_category.name,
                 user_id=test_user.id,
             )
 
@@ -243,6 +251,7 @@ class TestProductRouter(TestCase):
                 status="1",
                 grade="상",
                 category_id=test_category.id,
+                category_name=test_category.name,
                 user_id=test_user.id,
             )
 

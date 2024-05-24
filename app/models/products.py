@@ -26,13 +26,18 @@ class Product(Common, Model):
     )
     user_id: int
     category_id: int
+    category_name: str
 
     class Meta:
         table = "products"
 
     @classmethod
     async def get_all_by_products(cls) -> list[Product]:
-        return await cls.all()
+        products = await cls.all()
+        for product in products:
+            category = await product.category
+            product.category_name = category.name
+        return products
 
     @classmethod
     async def create_by_product(cls, product_data: ProductCreate) -> Product:
@@ -50,15 +55,26 @@ class Product(Common, Model):
 
     @classmethod
     async def get_by_product_id(cls, product_id: int) -> Product:
-        return await cls.get(id=product_id)
+        product = await cls.get(id=product_id).prefetch_related("category")
+        category = await product.category
+        product.category_name = category.name
+        return product
 
     @classmethod
     async def get_by_user_id(cls, user_id: int) -> list[Product]:
-        return await cls.filter(user_id=user_id).all()
+        products = await cls.filter(user_id=user_id).all()
+        for product in products:
+            category = await product.category
+            product.category_name = category.name
+        return products
 
     @classmethod
     async def get_by_category_id(cls, category_id: int) -> list[Product]:
-        return await cls.filter(category_id=category_id).all()
+        products = await cls.filter(category_id=category_id).all()
+        for product in products:
+            category = await product.category
+            product.category_name = category.name
+        return products
 
     @classmethod
     async def update_by_product_id(cls, product_id: int, request_data: ProductUpdate) -> Product:

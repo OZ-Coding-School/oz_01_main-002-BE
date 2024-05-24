@@ -25,17 +25,22 @@ async def service_create_auction(auction_data: AuctionCreate) -> AuctionCreate:
 async def service_get_all_auctions() -> list[AuctionResponse]:
     try:
         auctions = await Auction.get_all_by_auctions()
-        return [
-            AuctionResponse(
+        auction_responses = []
+        for auction in auctions:
+            auction_response = AuctionResponse(
                 id=auction.id,
                 product_id=auction.product_id,
+                product_name=auction.product_name,
+                product_bid_price=auction.product_bid_price,
+                product_grade=auction.product_grade,
+                is_active=auction.is_active,
                 start_time=auction.start_time.isoformat(),
                 end_time=auction.end_time.isoformat(),
                 status=auction.status,
                 charge=auction.charge,
             )
-            for auction in auctions
-        ]
+            auction_responses.append(auction_response)
+        return auction_responses
     except DoesNotExist:
         raise HTTPException(status_code=404, detail="product not found")
 
@@ -46,6 +51,10 @@ async def service_get_by_auction_id(auction_id: int) -> AuctionResponse:
         return AuctionResponse(
             id=auction.id,
             product_id=auction.product_id,
+            product_name=auction.product_name,
+            product_bid_price=auction.product_bid_price,
+            product_grade=auction.product_grade,
+            is_active=auction.is_active,
             start_time=auction.start_time.isoformat(),
             end_time=auction.end_time.isoformat(),
             status=auction.status,
