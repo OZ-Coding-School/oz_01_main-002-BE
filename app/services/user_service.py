@@ -12,7 +12,7 @@ import orjson
 from fastapi import Depends, HTTPException
 from fastapi.security import OAuth2PasswordBearer
 from jose import JWTError, jwt  # type: ignore
-from tortoise.exceptions import DoesNotExist, IntegrityError
+from tortoise.exceptions import DoesNotExist, IntegrityError, ValidationError
 
 from app.configs import settings
 from app.dtos.terms_agreement_response import TermsAgreementCreateResponse
@@ -24,6 +24,7 @@ from app.dtos.user_response import (
     UserGetProfileResponse,
     UserLoginResponse,
     UserSignUpResponse,
+    UserUpdateProfileResponse,
     VerifyContactResponse,
     VerifyEmailResponse,
     VerifyNicknameResponse,
@@ -194,7 +195,7 @@ def create_access_token(data: Mapping[str, str | float], expires_delta: timedelt
         expire = datetime.now(timezone.utc) + expires_delta
     else:
         expire = datetime.now(timezone.utc) + timedelta(days=1)
-    to_encode.update({"exp": expire.timestamp()})
+    # to_encode.update({"exp": expire.timestamp()})
     access_token = jwt.encode(to_encode, settings.SECRET_KEY, algorithm=settings.ALGORITHM)
     return access_token
 
@@ -322,3 +323,30 @@ async def service_get_user_detail(current_user: int) -> UserGetProfileResponse:
         content=user.content,
         address=f"{main_address.address} {main_address.detail_address}" if main_address else "",
     )
+
+
+async def service_update_user_detail(
+    request_data: UserUpdateProfileResponse, current_user: int
+) -> UserUpdateProfileResponse:
+
+    try:
+        # 사용자 업데이트
+        user = await User.update_by_user(request_data, current_user)
+
+        return UserUpdateProfileResponse(
+            nickname=user.nickname,
+            contact=user.contact,
+            content=user.content,
+        )
+
+    except DoesNotExist:
+        # 사용자가 존재하지 않는 경우
+        raise HTTPException(status_code=404, detail="사용자를 찾을 수 없습니다")
+
+    except IntegrityError as e:
+        # 데이터베이스 제약 조건 위반 등
+        raise HTTPException(status_code=400, detail=f"데이터베이스 오류: {str(e)}")
+
+    except ValidationError as e:
+        # 유효성 검사 오류
+        raise HTTPException(status_code=400, detail=f"유효하지 않은 데이터: {str(e)}")

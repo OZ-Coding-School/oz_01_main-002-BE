@@ -8,6 +8,7 @@ from app.dtos.user_response import (
     UserGetProfileResponse,
     UserLoginResponse,
     UserSignUpResponse,
+    UserUpdateProfileResponse,
     VerifyContactResponse,
     VerifyEmailResponse,
     VerifyNicknameResponse,
@@ -25,6 +26,7 @@ from app.services.user_service import (
     service_nickname_verification,
     service_signup,
     service_token_refresh,
+    service_update_user_detail,
 )
 
 router = APIRouter(prefix="/api/v1/users", tags=["User"], redirect_slashes=False)
@@ -81,3 +83,10 @@ async def create_coin(request_data: UserCoinCreateResponse, current_user: int = 
 @router.get("/")
 async def router_get_user_detail(current_user: int = Depends(get_current_user)) -> UserGetProfileResponse:
     return await service_get_user_detail(current_user)
+
+
+@router.put("/")
+async def router_update_user_detail(
+    request_data: UserUpdateProfileResponse, current_user: int = Depends(get_current_user)
+) -> UserUpdateProfileResponse:
+    return await service_update_user_detail(request_data, current_user)

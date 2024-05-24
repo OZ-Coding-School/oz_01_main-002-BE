@@ -54,3 +54,9 @@ class UserGetProfileResponse(BaseModel):
     age: int
     contact: str
     nickname: str
+
+
+class UserUpdateProfileResponse(BaseModel):
+    nickname: Optional[str] = None
+    contact: Optional[str] = None
+    content: Optional[str] = None
