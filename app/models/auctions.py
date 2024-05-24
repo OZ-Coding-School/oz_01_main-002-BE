@@ -19,10 +19,14 @@ class Auction(Common, Model):
         "models.Product", related_name="products", on_delete=fields.CASCADE
     )
     status = fields.BooleanField(default=True)
+    is_active = fields.CharField(max_length=10, default="경매중")
     start_time = fields.DatetimeField(auto_now_add=True)
     end_time = fields.DatetimeField(default=get_default_end_time)
     charge = fields.IntField(default=0)
     product_id: int
+    product_name: str
+    product_bid_price: int
+    product_grade: str
 
     class Meta:
         table = "auctions"
@@ -57,11 +61,22 @@ class Auction(Common, Model):
 
     @classmethod
     async def get_all_by_auctions(cls) -> list[Auction]:
-        return await cls.all()
+        auctions = await cls.all()
+        for auction in auctions:
+            product = await auction.product
+            auction.product_name = product.name
+            auction.product_bid_price = product.bid_price
+            auction.product_grade = product.grade
+        return auctions
 
     @classmethod
     async def get_by_auction_id(cls, auction_id: int) -> Auction:
-        return await cls.get(id=auction_id)
+        auction = await cls.get(id=auction_id)
+        product = await auction.product
+        auction.product_name = product.name
+        auction.product_bid_price = product.bid_price
+        auction.product_grade = product.grade
+        return auction
 
     @classmethod
     async def create_auction(cls, auction_data: AuctionCreate, charge: int) -> Auction:
