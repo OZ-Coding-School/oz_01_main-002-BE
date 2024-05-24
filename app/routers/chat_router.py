@@ -20,8 +20,8 @@ async def get() -> FileResponse:
 
 
 @router.post("/register_to_room/")
-async def register_user_to_room(body: MessageToRoomBaseResponse, current_user: int = Depends(get_current_user)) -> None:
-    await service_register_user_to_room(body, current_user)
+async def register_user_to_room(body: MessageToRoomBaseResponse) -> None:
+    await service_register_user_to_room(body)
 
 
 @router.websocket("/ws/{user_id}")
