@@ -59,7 +59,7 @@ class TestAuctionRouter(TestCase):
                 category_id=test_category.id,
                 user_id=test_user.id,
             )
-            auction_data = AuctionCreate(product_id=product_data.id, charge=0, status=True)
+            auction_data = AuctionCreate(product_id=product_data.id, charge=0, final_price=0, intstatus=True)
             response = await ac.post("/api/v1/auctions/", json=auction_data.dict())
             assert response.status_code == 200
 

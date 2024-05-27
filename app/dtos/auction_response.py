@@ -11,16 +11,19 @@ class AuctionResponse(BaseModel):
     product_name: str
     product_bid_price: int
     product_grade: str
+    category: str
+    final_price: int
     is_active: Optional[str] = None
     status: Optional[bool] = None
     start_time: Optional[datetime] = None
     end_time: Optional[datetime] = None
-    charge: Optional[int] = None
+    charge: Optional[float] = None
 
 
 class AuctionCreate(BaseModel):
     product_id: int
-    charge: int
+    charge: float
+    final_price: int
 
 
 class AuctionUpdate(BaseModel):
