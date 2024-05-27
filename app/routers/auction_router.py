@@ -2,7 +2,7 @@ from datetime import datetime
 
 from fastapi import APIRouter
 
-from app.dtos.auction_response import AuctionCreate, AuctionResponse, AuctionUpdate
+from app.dtos.auction_response import AuctionCreate, AuctionResponse, AuctionUpdate, AuctionGetResponse
 from app.models.auctions import Auction
 from app.services.auction_service import (
     service_create_auction,
@@ -28,8 +28,8 @@ async def router_create_auction(auction_data: AuctionCreate) -> AuctionCreate:
     return await service_create_auction(auction_data)
 
 
-@router.get("/{auction_id}", response_model=AuctionResponse)
-async def router_get_product_id(auction_id: int) -> AuctionResponse:
+@router.get("/{auction_id}", response_model=AuctionGetResponse)
+async def router_get_product_id(auction_id: int) -> AuctionGetResponse:
     return await service_get_by_auction_id(auction_id)
 
 

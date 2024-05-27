@@ -1,7 +1,7 @@
 from fastapi import HTTPException
 from tortoise.exceptions import DoesNotExist
 
-from app.dtos.auction_response import AuctionCreate, AuctionResponse, AuctionUpdate
+from app.dtos.auction_response import AuctionCreate, AuctionResponse, AuctionUpdate, AuctionGetResponse
 from app.models.auctions import Auction
 from app.models.categories import Category
 from app.models.products import Product
@@ -47,13 +47,13 @@ async def service_get_all_auctions() -> list[AuctionResponse]:
         raise HTTPException(status_code=404, detail="product not found")
 
 
-async def service_get_by_auction_id(auction_id: int) -> AuctionResponse:
+async def service_get_by_auction_id(auction_id: int) -> AuctionGetResponse:
     auction = await Auction.get_by_auction_id(auction_id)
     if auction:
         product = await Product.get(id=auction.product_id)
         category = await Category.get(id=product.category_id)
         user = await User.get(id=product.user_id)
-        return AuctionResponse(
+        return AuctionGetResponse(
             id=auction.id,
             product_id=auction.product_id,
             product_name=product.name,
