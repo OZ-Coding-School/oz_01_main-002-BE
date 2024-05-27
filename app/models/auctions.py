@@ -67,7 +67,7 @@ class Auction(Common, Model):
 
     @classmethod
     async def create_auction(cls, auction_data: AuctionCreate, charge: float) -> Auction:
-        return await cls.create(product_id=auction_data.product_id, charge=charge)
+        return await cls.create(product_id=auction_data.product_id, charge=charge, final_price=auction_data.final_price)
 
     @classmethod
     async def delete_auction_by_product_id(cls, auction_id: int) -> None:
