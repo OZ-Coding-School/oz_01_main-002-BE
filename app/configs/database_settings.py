@@ -17,6 +17,7 @@ TORTOISE_APP_MODELS = [
     "app.models.carries",
     "app.models.payments",
     "app.models.auctions",
+    "app.models.winners",
 ]
 
 TORTOISE_ORM = {
