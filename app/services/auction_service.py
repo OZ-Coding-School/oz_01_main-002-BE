@@ -5,7 +5,7 @@ from app.dtos.auction_response import AuctionCreate, AuctionResponse, AuctionUpd
 from app.models.auctions import Auction
 from app.models.categories import Category
 from app.models.products import Product
-
+from app.models.users import User
 
 async def service_create_auction(auction_data: AuctionCreate) -> AuctionCreate:
     try:
@@ -52,12 +52,14 @@ async def service_get_by_auction_id(auction_id: int) -> AuctionResponse:
     if auction:
         product = await Product.get(id=auction.product_id)
         category = await Category.get(id=product.category_id)
+        user = await User.get(id=product.user_id)
         return AuctionResponse(
             id=auction.id,
             product_id=auction.product_id,
             product_name=product.name,
             product_bid_price=product.bid_price,
             product_grade=product.grade,
+            product_content=product.content,
             is_active=auction.is_active,
             start_time=auction.start_time.isoformat(),
             end_time=auction.end_time.isoformat(),
@@ -65,6 +67,8 @@ async def service_get_by_auction_id(auction_id: int) -> AuctionResponse:
             charge=auction.charge,
             category=category.name,
             final_price=auction.final_price,
+            user_nickname=user.nickname,
+            user_content=user.content
         )
     raise HTTPException(status_code=404, detail="Product not found")
 

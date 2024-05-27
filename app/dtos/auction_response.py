@@ -18,6 +18,9 @@ class AuctionResponse(BaseModel):
     start_time: Optional[datetime] = None
     end_time: Optional[datetime] = None
     charge: Optional[float] = None
+    product_content: str
+    user_nickname: str
+    user_content: str
 
 
 class AuctionCreate(BaseModel):
