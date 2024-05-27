@@ -2,7 +2,12 @@ from datetime import datetime
 
 from fastapi import APIRouter
 
-from app.dtos.auction_response import AuctionCreate, AuctionResponse, AuctionUpdate, AuctionGetResponse
+from app.dtos.auction_response import (
+    AuctionCreate,
+    AuctionGetResponse,
+    AuctionResponse,
+    AuctionUpdate,
+)
 from app.models.auctions import Auction
 from app.services.auction_service import (
     service_create_auction,
