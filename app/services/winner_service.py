@@ -2,9 +2,10 @@ from fastapi import HTTPException
 from tortoise.exceptions import IntegrityError, ValidationError
 
 from app.dtos.winner_response import WinnerCreateResponse, WinnerGetResponse
+from app.models.auctions import Auction
 from app.models.users import User
 from app.models.winners import Winner
-from app.models.auctions import Auction
+
 
 async def service_get_by_winner(product_id: int) -> WinnerGetResponse:
     winner = await Winner.get_by_winner(product_id)
@@ -30,7 +31,7 @@ async def service_create_winner(request_data: WinnerCreateResponse, current_user
             raise IntegrityError("이미 존재하는 낙찰금입니다.")
         winner = await Winner.create_by_winner(request_data, current_user)
         auction = await Auction.get(id=winner.auction_id)
-        auction.final_price=winner.bid_price
+        auction.final_price = winner.bid_price
         await auction.save()
         raise HTTPException(status_code=201, detail="낙찰하셨습니다.")
     except IntegrityError as e:

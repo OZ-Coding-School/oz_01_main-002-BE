@@ -20,7 +20,7 @@ class Winner(Common, Model):
     user_id: int
     auction_id: int
     product_id: int
-    bid_price = fields.FloatField()
+    bid_price = fields.IntField()
 
     class Meta:
         table = "winners"
