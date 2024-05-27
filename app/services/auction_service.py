@@ -16,7 +16,7 @@ async def service_create_auction(auction_data: AuctionCreate) -> AuctionCreate:
     bid_price = await Auction.get_bid_price(auction_data.product_id)
     charge = await Auction.calculate_charge(bid_price)
 
-    auction = await Auction.create_auction(auction_data, charge=charge, final_price=auction_data.final_price)
+    auction = await Auction.create_auction(auction_data, charge=charge)
     return AuctionCreate(product_id=auction.product_id, charge=charge, final_price=auction_data.final_price)
 
 
