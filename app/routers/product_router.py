@@ -1,11 +1,6 @@
 from fastapi import APIRouter, Depends
 
-from app.dtos.product_response import (
-    ProductCreate,
-    ProductGetResponse,
-    ProductOut,
-    ProductUpdate,
-)
+from app.dtos.product_response import ProductCreate, ProductGetResponse, ProductUpdate
 from app.services.product_service import (
     service_create_product,
     service_delete_product,
@@ -32,8 +27,8 @@ async def router_create_product(
     return await service_create_product(request_data, current_user)
 
 
-@router.get("/{product_id}", response_model=ProductOut)
-async def router_get_product_id(product_id: int, _: int = Depends(get_current_user)) -> ProductOut:
+@router.get("/{product_id}", response_model=ProductGetResponse)
+async def router_get_product_id(product_id: int, _: int = Depends(get_current_user)) -> ProductGetResponse:
     return await service_get_by_product_id(product_id)
 
 
@@ -42,8 +37,10 @@ async def router_get_products_by_user_id(current_user: int = Depends(get_current
     return await service_get_products_by_user_id(current_user)
 
 
-@router.get("/categories/{category_id}", response_model=list[ProductOut])
-async def router_get_products_by_item_id(category_id: int, _: int = Depends(get_current_user)) -> list[ProductOut]:
+@router.get("/categories/{category_id}", response_model=list[ProductGetResponse])
+async def router_get_products_by_item_id(
+    category_id: int, _: int = Depends(get_current_user)
+) -> list[ProductGetResponse]:
     return await service_get_products_by_category_id(category_id)
 
 

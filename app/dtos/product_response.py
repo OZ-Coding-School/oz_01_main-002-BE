@@ -4,11 +4,11 @@ from pydantic import BaseModel
 
 
 class ProductBase(BaseModel):
-    name: Optional[str] = None
-    content: Optional[str] = None
-    bid_price: Optional[int] = None
-    duration: Optional[int] = None
-    status: Optional[str] = None
+    name: str
+    content: str
+    bid_price: int
+    duration: int
+    status: str
     modify: bool
     grade: str
     category_id: int
@@ -26,14 +26,6 @@ class ProductUpdate(BaseModel):
     status: Optional[str] = None
 
 
-class ProductOut(ProductBase):
-    id: int
-    status: str
-    modify: bool
-    grade: str
-    category_id: int
-
-
 class ProductGetResponse(BaseModel):
     id: int
     name: str
@@ -45,3 +37,6 @@ class ProductGetResponse(BaseModel):
     grade: str
     category: str
     is_approved: bool
+    winner_user_id: int | None
+    winner_nickname: str | None
+    winner_bid_price: float | None
