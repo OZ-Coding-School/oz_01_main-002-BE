@@ -46,3 +46,4 @@ class AuctionCreate(BaseModel):
 
 class AuctionUpdate(BaseModel):
     status: bool
+    is_active: str
