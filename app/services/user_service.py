@@ -19,7 +19,6 @@ from app.dtos.terms_agreement_response import TermsAgreementCreateResponse
 from app.dtos.terms_response import TermIDResponse
 from app.dtos.user_response import (
     SendVerificationCodeResponse,
-    TokenResponse,
     UserCoinCreateResponse,
     UserGetProfileResponse,
     UserLoginResponse,
@@ -261,17 +260,6 @@ async def service_token_refresh(current_refresh: str) -> dict[str, str]:
 
 async def service_create_coin(request_data: UserCoinCreateResponse, current_user: int) -> None:
     await User.update_by_user_coin(request_data, current_user)
-
-
-async def service_check_token(request_data: TokenResponse) -> None:
-    if request_data.token_type == "access_token":
-        try:
-            jwt.decode(request_data.token, settings.SECRET_KEY, algorithms=settings.ALGORITHM)
-            raise HTTPException(status_code=200, detail="Token is ready for use")
-        except JWTError as e:
-            raise HTTPException(status_code=401, detail=str(e))
-
-    raise HTTPException(status_code=401, detail="Invalid Token")
 
 
 # JWT 토큰을 검증하고 user_id를 반환하는 함수

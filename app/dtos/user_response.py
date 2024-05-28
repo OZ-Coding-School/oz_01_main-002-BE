@@ -35,11 +35,6 @@ class UserLoginResponse(BaseModel):
     password: str
 
 
-class TokenResponse(BaseModel):
-    token_type: str
-    token: str
-
-
 class UserCoinCreateResponse(BaseModel):
     coin: float
 

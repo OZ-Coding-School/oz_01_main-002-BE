@@ -15,7 +15,7 @@ from app.models.winners import Winner
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 
-class TestTermAgreementRouter(TestCase):
+class TestWinnerRouter(TestCase):
     @staticmethod
     def hash_password(password: str) -> Any:
         return pwd_context.hash(password)

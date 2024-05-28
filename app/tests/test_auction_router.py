@@ -163,6 +163,7 @@ class TestAuctionRouter(TestCase):
 
             update_auction_data = {
                 "status": False,
+                "is_active": "경매완료",
             }
 
             response = await ac.put(f"/api/v1/auctions/{auction_data.id}", json=update_auction_data)
