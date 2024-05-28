@@ -10,10 +10,6 @@ from app.models.common import Common
 from app.models.products import Product
 
 
-def get_default_end_time() -> datetime:
-    return datetime.now() + timedelta(minutes=3)
-
-
 class Auction(Common, Model):
     product: fields.ForeignKeyRelation[Product] = fields.ForeignKeyField(
         "models.Product", related_name="products", on_delete=fields.CASCADE
@@ -21,7 +17,7 @@ class Auction(Common, Model):
     status = fields.BooleanField(default=True)
     is_active = fields.CharField(max_length=10, default="경매중")
     start_time = fields.DatetimeField(auto_now_add=True)
-    end_time = fields.DatetimeField(default=get_default_end_time)
+    end_time = fields.DatetimeField()
     charge = fields.FloatField(default=0)
     final_price = fields.IntField(default=0)
     product_id: int
@@ -71,7 +67,12 @@ class Auction(Common, Model):
 
     @classmethod
     async def create_auction(cls, auction_data: AuctionCreate, charge: float) -> Auction:
-        return await cls.create(product_id=auction_data.product_id, charge=charge, final_price=auction_data.final_price)
+        return await cls.create(
+            product_id=auction_data.product_id,
+            charge=charge,
+            final_price=auction_data.final_price,
+            end_time=datetime.now(),
+        )
 
     @classmethod
     async def delete_auction_by_product_id(cls, auction_id: int) -> None:

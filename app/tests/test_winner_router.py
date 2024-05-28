@@ -1,3 +1,4 @@
+from datetime import datetime
 from typing import Any
 
 from httpx import AsyncClient
@@ -8,7 +9,6 @@ from app import app
 from app.models.auctions import Auction
 from app.models.categories import Category
 from app.models.products import Product
-from app.models.terms_agreements import TermsAgreement
 from app.models.users import User
 from app.models.winners import Winner
 
@@ -56,6 +56,7 @@ class TestTermAgreementRouter(TestCase):
             product_id=product_id,
             charge=0,
             status=True,
+            end_time=datetime.now(),
         )
 
     async def test_service_get_by_winner(self) -> None:

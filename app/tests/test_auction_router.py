@@ -1,4 +1,4 @@
-from datetime import datetime, timedelta
+from datetime import datetime
 
 from httpx import AsyncClient
 from tortoise.contrib.test import TestCase
@@ -59,7 +59,13 @@ class TestAuctionRouter(TestCase):
                 category_id=test_category.id,
                 user_id=test_user.id,
             )
-            auction_data = AuctionCreate(product_id=product_data.id, charge=0, final_price=0, intstatus=True)
+            auction_data = AuctionCreate(
+                product_id=product_data.id,
+                charge=0,
+                final_price=0,
+                intstatus=True,
+                end_time=datetime.now(),
+            )
             response = await ac.post("/api/v1/auctions/", json=auction_data.dict())
             assert response.status_code == 200
 
@@ -89,8 +95,12 @@ class TestAuctionRouter(TestCase):
                 category_id=test_category.id,
                 user_id=test_user.id,
             )
-            auction_data1 = await Auction.create(product_id=product_data1.id, charge=0, status=True)
-            auction_data2 = await Auction.create(product_id=product_data2.id, charge=0, status=True)
+            auction_data1 = await Auction.create(
+                product_id=product_data1.id, charge=0, status=True, end_time=datetime.now()
+            )
+            auction_data2 = await Auction.create(
+                product_id=product_data2.id, charge=0, status=True, end_time=datetime.now()
+            )
 
             response = await ac.get("/api/v1/auctions/")
 
@@ -120,7 +130,9 @@ class TestAuctionRouter(TestCase):
                 category_id=test_category.id,
                 user_id=test_user.id,
             )
-            auction_data1 = await Auction.create(product_id=product_data1.id, charge=0, status=True)
+            auction_data1 = await Auction.create(
+                product_id=product_data1.id, charge=0, status=True, end_time=datetime.now()
+            )
 
             response = await ac.get(f"/api/v1/auctions/{auction_data1.id}")
 
@@ -145,7 +157,9 @@ class TestAuctionRouter(TestCase):
                 category_id=test_category.id,
                 user_id=test_user.id,
             )
-            auction_data = await Auction.create(product_id=product_data1.id, charge=0, status=True)
+            auction_data = await Auction.create(
+                product_id=product_data1.id, charge=0, status=True, end_time=datetime.now()
+            )
 
             update_auction_data = {
                 "status": False,
@@ -173,7 +187,9 @@ class TestAuctionRouter(TestCase):
                 category_id=test_category.id,
                 user_id=test_user.id,
             )
-            auction_data = await Auction.create(product_id=product_data1.id, charge=0, status=True)
+            auction_data = await Auction.create(
+                product_id=product_data1.id, charge=0, status=True, end_time=datetime.now()
+            )
 
             response = await ac.delete(f"/api/v1/auctions/{auction_data.id}")
 

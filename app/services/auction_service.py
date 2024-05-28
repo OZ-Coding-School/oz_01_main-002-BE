@@ -1,3 +1,5 @@
+from datetime import timedelta
+
 from fastapi import HTTPException
 from tortoise.exceptions import DoesNotExist
 
@@ -23,6 +25,8 @@ async def service_create_auction(auction_data: AuctionCreate) -> AuctionCreate:
     charge = await Auction.calculate_charge(bid_price)
 
     auction = await Auction.create_auction(auction_data, charge=charge)
+    auction.end_time = auction.start_time + timedelta(days=product.duration)
+    await auction.save()
     return AuctionCreate(product_id=auction.product_id, charge=charge, final_price=auction_data.final_price)
 
 
