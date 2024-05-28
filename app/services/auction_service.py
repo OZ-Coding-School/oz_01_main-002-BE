@@ -99,7 +99,7 @@ async def service_update_auction(auction_id: int, auction_data: AuctionUpdate) -
 
     new_auction = await Auction.update_by_auction_id(auction_id, auction_data)
 
-    return AuctionUpdate(status=new_auction.status)
+    return AuctionUpdate(status=new_auction.status, is_active=new_auction.is_active)
 
 
 async def service_get_auctions_by_category_id(category_id: int) -> list[AuctionGetResponse]:
