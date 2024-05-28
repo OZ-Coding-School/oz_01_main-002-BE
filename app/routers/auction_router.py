@@ -13,6 +13,7 @@ from app.services.auction_service import (
     service_create_auction,
     service_delete_auction_by_id,
     service_get_all_auctions,
+    service_get_auctions_by_category_id,
     service_get_by_auction_id,
     service_update_auction,
 )
@@ -47,3 +48,8 @@ async def router_delete_auction_by_id(auction_id: int) -> dict[str, str]:
 @router.put("/{auction_id}", response_model=AuctionUpdate)
 async def router_update_auction(auction_id: int, request_data: AuctionUpdate) -> AuctionUpdate:
     return await service_update_auction(auction_id, request_data)
+
+
+@router.get("/categories/{category_id}", response_model=list[AuctionGetResponse])
+async def router_get_auctions_by_category_id(category_id: int) -> list[AuctionGetResponse]:
+    return await service_get_auctions_by_category_id(category_id)
