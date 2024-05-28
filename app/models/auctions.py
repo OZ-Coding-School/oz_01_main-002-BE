@@ -66,6 +66,10 @@ class Auction(Common, Model):
         return await cls.get(id=auction_id)
 
     @classmethod
+    async def get_auctions_by_category_id(cls, category_id: int) -> Auction:
+        return await cls.get(category_id=category_id)
+
+    @classmethod
     async def create_auction(cls, auction_data: AuctionCreate, charge: float) -> Auction:
         return await cls.create(product_id=auction_data.product_id, charge=charge, final_price=auction_data.final_price)
 

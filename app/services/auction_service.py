@@ -96,3 +96,40 @@ async def service_update_auction(auction_id: int, auction_data: AuctionUpdate) -
     new_auction = await Auction.update_by_auction_id(auction_id, auction_data)
 
     return AuctionUpdate(status=new_auction.status)
+
+
+async def service_get_auctions_by_category_id(category_id: int) -> list[AuctionGetResponse]:
+    products = await Product.filter(category_id=category_id).all()
+
+    if not products:
+        raise HTTPException(status_code=404, detail="Products not found for the given category ID")
+
+    auctions_out = []
+
+    for product in products:
+        auction = await Auction.filter(product_id=product.id).first()
+
+        if auction:
+            category = await Category.get(id=product.category_id)
+            user = await User.get(id=product.user_id)
+
+            auction_out = AuctionGetResponse(
+                id=auction.id,
+                product_id=auction.product_id,
+                product_name=product.name,
+                product_bid_price=product.bid_price,
+                product_grade=product.grade,
+                product_content=product.content,
+                is_active=auction.is_active,
+                start_time=auction.start_time.isoformat(),
+                end_time=auction.end_time.isoformat(),
+                status=auction.status,
+                charge=auction.charge,
+                category=category.name,
+                final_price=auction.final_price,
+                user_nickname=user.nickname,
+                user_content=user.content,
+            )
+            auctions_out.append(auction_out)
+
+    return auctions_out
