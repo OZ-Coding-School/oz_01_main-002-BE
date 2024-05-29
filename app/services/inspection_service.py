@@ -19,7 +19,6 @@ async def service_get_all_inspection() -> list[InspectionGetResponse]:
             id=inspection.id,
             inspector=inspection.inspector,
             product_id=inspection.product_id,
-            inspection_count=inspection.inspection_count,
             created_at=inspection.created_at,
             updated_at=inspection.updated_at,
         )
@@ -36,7 +35,6 @@ async def service_get_detail_inspection(product_id: int) -> list[InspectionGetRe
             id=inspection.id,
             inspector=inspection.inspector,
             product_id=inspection.product_id,
-            inspection_count=inspection.inspection_count,
             created_at=inspection.created_at,
             updated_at=inspection.updated_at,
         )
@@ -53,7 +51,6 @@ async def service_get_one_inspection(inspection_id: int) -> InspectionGetRespons
         id=inspection.id,
         inspector=inspection.inspector,
         product_id=inspection.product_id,
-        inspection_count=inspection.inspection_count,
         created_at=inspection.created_at,
         updated_at=inspection.updated_at,
     )
@@ -87,4 +84,4 @@ async def service_update_inspection(
     except DoesNotExist:
         raise HTTPException(status_code=404, detail="Inspection 아이디 값이 없습니다.")
 
-    return InspectionUpdateResponse(inspector=inspection.inspector, inspection_count=inspection.inspection_count)
+    return InspectionUpdateResponse(inspector=inspection.inspector)

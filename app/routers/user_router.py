@@ -3,11 +3,11 @@ from fastapi import APIRouter, Depends, Response
 from app.dtos.terms_response import TermIDResponse
 from app.dtos.user_response import (
     SendVerificationCodeResponse,
-    TokenResponse,
     UserCoinCreateResponse,
     UserGetProfileResponse,
     UserLoginResponse,
     UserSignUpResponse,
+    UserUpdateProfileResponse,
     VerifyContactResponse,
     VerifyEmailResponse,
     VerifyNicknameResponse,
@@ -16,7 +16,6 @@ from app.services.user_service import (
     get_current_refresh,
     get_current_user,
     send_verification_email,
-    service_check_token,
     service_code_authentication,
     service_contact_verification,
     service_create_coin,
@@ -25,6 +24,7 @@ from app.services.user_service import (
     service_nickname_verification,
     service_signup,
     service_token_refresh,
+    service_update_user_detail,
 )
 
 router = APIRouter(prefix="/api/v1/users", tags=["User"], redirect_slashes=False)
@@ -68,11 +68,6 @@ async def refresh_token(current_refresh: str = Depends(get_current_refresh)) -> 
     return await service_token_refresh(current_refresh)
 
 
-@router.post("/check/token")
-async def check_token(request_data: TokenResponse) -> None:
-    return await service_check_token(request_data)
-
-
 @router.put("/coin")
 async def create_coin(request_data: UserCoinCreateResponse, current_user: int = Depends(get_current_user)) -> None:
     return await service_create_coin(request_data, current_user)
@@ -81,3 +76,10 @@ async def create_coin(request_data: UserCoinCreateResponse, current_user: int = 
 @router.get("/")
 async def router_get_user_detail(current_user: int = Depends(get_current_user)) -> UserGetProfileResponse:
     return await service_get_user_detail(current_user)
+
+
+@router.put("/")
+async def router_update_user_detail(
+    request_data: UserUpdateProfileResponse, current_user: int = Depends(get_current_user)
+) -> UserUpdateProfileResponse:
+    return await service_update_user_detail(request_data, current_user)
