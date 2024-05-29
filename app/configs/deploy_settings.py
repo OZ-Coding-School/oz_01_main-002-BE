@@ -15,4 +15,7 @@ class DeploySettings(Settings):
     REDIS_URL: str = env["REDIS_URL"]
     SECRET_KEY: str = env["SECRET_KEY"]
     ALGORITHM: str = env["ALGORITHM"]
+    AWS_ACCESS_KEY_ID: str = env["AWS_ACCESS_KEY_ID"]
+    AWS_SECRET_ACCESS_KEY: str = env["AWS_SECRET_ACCESS_KEY"]
+    AWS_S3_BUCKET_NAME: str = env["AWS_S3_BUCKET_NAME"]
     redis_ttl: int = 300
