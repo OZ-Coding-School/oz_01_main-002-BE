@@ -23,8 +23,27 @@ async def router_get_products(_: int = Depends(get_current_user)) -> list[Produc
 
 @router.post("/", response_model=ProductCreate)
 async def router_create_product(
-    request_data: ProductCreate, current_user: int = Depends(get_current_user), file: UploadFile = File(...)
+    name: str = Form(...),
+    content: str = Form(...),
+    bid_price: int = Form(...),
+    duration: int = Form(...),
+    status: str = Form(...),
+    modify: bool = Form(...),
+    grade: str = Form(...),
+    category_id: int = Form(...),
+    file: UploadFile = Form(...),
+    current_user: int = Depends(get_current_user),
 ) -> ProductCreate:
+    request_data = ProductCreate(
+        name=name,
+        content=content,
+        bid_price=bid_price,
+        duration=duration,
+        status=status,
+        modify=modify,
+        grade=grade,
+        category_id=category_id,
+    )
     return await service_create_product(request_data, current_user, file)
 
 
