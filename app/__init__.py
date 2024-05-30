@@ -15,6 +15,7 @@ from app.routers.term_agreement_router import router as term_agreement_router
 from app.routers.term_router import router as term_router
 from app.routers.user_router import router as user_router
 from app.routers.winner_router import router as winner_router
+from app.routers.hashcheck import router as hashcheck_router
 
 app = FastAPI()
 app.add_middleware(
@@ -37,4 +38,6 @@ app.include_router(payment_router)
 app.include_router(auction_router)
 app.include_router(winner_router)
 app.include_router(image_router)
+app.include_router(hashcheck_router)
 initialize(app)
+
