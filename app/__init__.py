@@ -7,6 +7,7 @@ from app.routers.auction_router import router as auction_router
 from app.routers.carries_router import router as carries_router
 from app.routers.category_router import router as category_router
 from app.routers.chat_router import router as chat_router
+from app.routers.image_router import router as image_router
 from app.routers.inspector_router import router as inspector_router
 from app.routers.payment_router import router as payment_router
 from app.routers.product_router import router as product_router
@@ -35,4 +36,5 @@ app.include_router(carries_router)
 app.include_router(payment_router)
 app.include_router(auction_router)
 app.include_router(winner_router)
+app.include_router(image_router)
 initialize(app)
