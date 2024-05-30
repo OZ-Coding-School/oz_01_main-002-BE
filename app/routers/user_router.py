@@ -1,5 +1,3 @@
-from typing import Optional
-
 from fastapi import APIRouter, Depends, File, UploadFile
 
 from app.dtos.terms_response import TermIDResponse
@@ -27,6 +25,7 @@ from app.services.user_service import (
     service_signup,
     service_token_refresh,
     service_update_user_detail,
+    service_update_user_image,
 )
 
 router = APIRouter(prefix="/api/v1/users", tags=["User"], redirect_slashes=False)
@@ -81,10 +80,14 @@ async def router_get_user_detail(current_user: int = Depends(get_current_user)) 
 
 @router.put("/")
 async def router_update_user_detail(
-    nickname: Optional[str] = None,
-    contact: Optional[str] = None,
-    content: Optional[str] = None,
-    file: Optional[UploadFile] = File(None),
+    request_data: UserUpdateProfileResponse,
     current_user: int = Depends(get_current_user),
 ) -> UserUpdateProfileResponse:
-    return await service_update_user_detail(file, current_user, nickname, contact, content)
+    return await service_update_user_detail(request_data, current_user)
+
+
+@router.put("/image")
+async def route_update_user_image(
+    file: UploadFile = File(None), current_user: int = Depends(get_current_user)
+) -> dict[str, str]:
+    return await service_update_user_image(file, current_user)

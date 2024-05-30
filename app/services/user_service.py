@@ -6,7 +6,7 @@ from collections.abc import Mapping
 from datetime import datetime, timedelta, timezone
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
-from typing import Any, Optional
+from typing import Any
 
 import orjson
 from fastapi import Depends, HTTPException, UploadFile
@@ -15,6 +15,7 @@ from jose import JWTError, jwt  # type: ignore
 from tortoise.exceptions import DoesNotExist, IntegrityError, ValidationError
 
 from app.configs import settings
+from app.dtos.image_response import ImageResponse
 from app.dtos.terms_agreement_response import TermsAgreementCreateResponse
 from app.dtos.terms_response import TermIDResponse
 from app.dtos.user_response import (
@@ -337,26 +338,13 @@ async def service_get_user_detail(current_user: int) -> UserGetProfileResponse:
 
 
 async def service_update_user_detail(
-    file: UploadFile | None,
+    request_data: UserUpdateProfileResponse,
     current_user: int,
-    nickname: Optional[str] = None,
-    contact: Optional[str] = None,
-    content: Optional[str] = None,
 ) -> UserUpdateProfileResponse:
 
     try:
         # 사용자 업데이트
-        user = await User.update_by_user(
-            UserUpdateProfileResponse(nickname=nickname, contact=contact, content=content), current_user
-        )
-
-        if file is not None:
-            image = await Image.get(componant="user", target_id=user.id)
-            image_url = await service_upload_image(file, "user")
-
-            setattr(image, "url", image_url)
-
-            await image.save()
+        user = await User.update_by_user(request_data, current_user)
 
         return UserUpdateProfileResponse(
             nickname=user.nickname,
@@ -375,3 +363,23 @@ async def service_update_user_detail(
     except ValidationError as e:
         # 유효성 검사 오류
         raise HTTPException(status_code=400, detail=f"유효하지 않은 데이터: {str(e)}")
+
+
+async def service_update_user_image(file: UploadFile, current_user: int) -> dict[str, str]:
+    if file is not None:
+        image_url = await service_upload_image(file, "user")
+        try:
+            image = await Image.get(componant="user", target_id=current_user)
+
+            setattr(image, "url", image_url)
+
+            await image.save()
+
+            return {"message": f"{image.component} image is save to s3"}
+
+        except DoesNotExist:
+            item_data = ImageResponse(
+                component="user", target_id=current_user, description=file.filename, url=image_url
+            )
+            await Image.create_image(request_data=item_data)
+            return {"message": "'user' image is save to s3"}
