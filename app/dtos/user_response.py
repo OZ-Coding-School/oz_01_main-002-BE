@@ -49,7 +49,7 @@ class UserGetProfileResponse(BaseModel):
     age: int
     contact: str
     nickname: str
-    images: str | None
+    image: str | None
 
 
 class UserUpdateProfileResponse(BaseModel):

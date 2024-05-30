@@ -303,7 +303,7 @@ async def service_get_user_detail(current_user: int) -> UserGetProfileResponse:
     if not user:
         raise HTTPException(status_code=404, detail="Not Found - User not found")
     main_address = await Address.get_main_address_by_user_id(current_user)
-    images = await service_get_images("product", user.id)
+    images = await service_get_images("user", user.id)
     if len(images) == 0:
         return UserGetProfileResponse(
             email=user.email,
@@ -317,7 +317,7 @@ async def service_get_user_detail(current_user: int) -> UserGetProfileResponse:
             age=user.age,
             content=user.content,
             address=f"{main_address.address} {main_address.detail_address}" if main_address else "",
-            images=None,
+            image=None,
         )
     else:
         image_urls = [img.url for img in images]
@@ -333,7 +333,7 @@ async def service_get_user_detail(current_user: int) -> UserGetProfileResponse:
         age=user.age,
         content=user.content,
         address=f"{main_address.address} {main_address.detail_address}" if main_address else "",
-        images=image_urls[0],
+        image=image_urls[0],
     )
 
 
@@ -369,19 +369,13 @@ async def service_update_user_image(file: UploadFile, current_user: int) -> dict
     if file is not None:
         image_url = await service_upload_image(file, "user")
         try:
-            image = await Image.get(componant="user", target_id=current_user)
+            image = await Image.get(component="user", target_id=current_user)
 
-            await image.delete()
+            setattr(image, "url", image_url)
 
-            image_data = ImageResponse(
-                component="user",
-                target_id=current_user,
-                description=file.filename,
-                url=image_url,
-            )
-            await Image.create_image(request_data=image_data)
+            await image.save()
 
-            return {"message": "'user' image is save to s3"}
+            return {"message": f"{image.component} image is save to s3"}
 
         except DoesNotExist:
             item_data = ImageResponse(

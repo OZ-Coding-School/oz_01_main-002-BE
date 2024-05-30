@@ -86,7 +86,7 @@ async def router_update_user_detail(
     return await service_update_user_detail(request_data, current_user)
 
 
-@router.post("/image")
+@router.put("/image")
 async def route_update_user_image(
     file: UploadFile = File(None), current_user: int = Depends(get_current_user)
 ) -> dict[str, str]:
