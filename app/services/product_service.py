@@ -1,8 +1,8 @@
 from fastapi import HTTPException, UploadFile
 from tortoise.exceptions import DoesNotExist
 
-from app.dtos.product_response import ProductCreate, ProductGetResponse, ProductUpdate
 from app.dtos.image_response import ImageClassificationResponse
+from app.dtos.product_response import ProductCreate, ProductGetResponse, ProductUpdate
 from app.models.categories import Category
 from app.models.products import Product
 from app.models.users import User

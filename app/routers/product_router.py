@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, UploadFile, File, Form
+from fastapi import APIRouter, Depends, File, Form, UploadFile
 
 from app.dtos.image_response import ProductImageResponse
 from app.dtos.product_response import ProductCreate, ProductGetResponse, ProductUpdate
