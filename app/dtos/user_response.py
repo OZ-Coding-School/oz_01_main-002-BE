@@ -2,6 +2,8 @@ from typing import Optional
 
 from pydantic import BaseModel
 
+from fastapi import UploadFile
+
 
 class UserSignUpResponse(BaseModel):
     name: str
@@ -49,6 +51,7 @@ class UserGetProfileResponse(BaseModel):
     age: int
     contact: str
     nickname: str
+    images: list[UploadFile]
 
 
 class UserUpdateProfileResponse(BaseModel):

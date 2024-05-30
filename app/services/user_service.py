@@ -30,6 +30,7 @@ from app.dtos.user_response import (
 )
 from app.models.address import Address
 from app.models.users import User
+from app.services.image_service import service_get_images
 from app.services.term_agreement_service import service_create_terms_agreement
 from app.utils.redis_ import redis
 
@@ -300,6 +301,10 @@ async def service_get_user_detail(current_user: int) -> UserGetProfileResponse:
     if not user:
         raise HTTPException(status_code=404, detail="Not Found - User not found")
     main_address = await Address.get_main_address_by_user_id(current_user)
+    images = await service_get_images("product", user.id)
+    if images is None:
+        raise HTTPException(status_code=404, detail="image not found")
+    image_urls = [img.url for img in images]
     return UserGetProfileResponse(
         email=user.email,
         name=user.name,
@@ -312,6 +317,7 @@ async def service_get_user_detail(current_user: int) -> UserGetProfileResponse:
         age=user.age,
         content=user.content,
         address=f"{main_address.address} {main_address.detail_address}" if main_address else "",
+        images=image_urls,
     )
 
 
