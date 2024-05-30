@@ -1,13 +1,19 @@
-from fastapi import APIRouter, UploadFile, File, Form
+from fastapi import APIRouter, File, Form, UploadFile
 
-from app.dtos.image_response import ImageClassificationResponse, ImageUrlResponse, ImageComponentResponse
-from app.services.image_service import service_save_image, service_get_images
+from app.dtos.image_response import (
+    ImageClassificationResponse,
+    ImageComponentResponse,
+    ImageUrlResponse,
+)
+from app.services.image_service import service_get_images, service_save_image
 
 router = APIRouter(prefix="/api/v1/image", tags=["image"], redirect_slashes=False)
 
 
 @router.post("/upload")
-async def save_image(component: str = Form(...), target_id: int = Form(...), description: str = Form(...), file: UploadFile = File(...)) -> dict[str, str]:
+async def save_image(
+    component: str = Form(...), target_id: int = Form(...), description: str = Form(...), file: UploadFile = File(...)
+) -> dict[str, str]:
     request_data = ImageClassificationResponse(component=component, target_id=target_id, description=description)
     return await service_save_image(file, request_data)
 

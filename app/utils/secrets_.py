@@ -2,13 +2,14 @@
 # If you need more information about configurations
 # or implementing the sample code, visit the AWS docs:
 # https://aws.amazon.com/developer/language/python/
+from typing import Any
 
-import boto3
+import boto3  # type: ignore
 import orjson
-from botocore.exceptions import ClientError, NoCredentialsError
+from botocore.exceptions import ClientError, NoCredentialsError  # type: ignore
 
 
-def get_secret():
+def get_secret() -> Any:
 
     secret_name = "mpg/secrets/env"
     region_name = "ap-northeast-2"
@@ -23,12 +24,12 @@ def get_secret():
         return orjson.loads(secret)
 
     except NoCredentialsError:
-        raise "Credentials not available"
+        return {"message": "Credentials not available"}
     except ClientError as e:
         if e.response["Error"]["Code"] == "ResourceNotFoundException":
-            raise "The requested secret was not found"
+            return {"message": "The requested secret was not found"}
         else:
-            raise {"Error occurred: ", e}
+            return {"Error occurred: ": str(e)}
 
 
 if __name__ == "__main__":

@@ -1,4 +1,4 @@
-from app.configs import Settings
+from app.configs import Settings  # type: ignore
 from app.utils.secrets_ import get_secret
 
 env = get_secret()

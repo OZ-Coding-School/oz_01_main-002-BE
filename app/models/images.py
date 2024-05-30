@@ -1,7 +1,11 @@
 from tortoise import fields
 from tortoise.models import Model
 
-from app.dtos.image_response import ImageResponse, ImageComponentResponse, ImageUrlResponse
+from app.dtos.image_response import (
+    ImageComponentResponse,
+    ImageResponse,
+    ImageUrlResponse,
+)
 from app.models.common import Common
 
 
@@ -15,7 +19,7 @@ class Image(Model, Common):
         table = "images"
 
     @classmethod
-    async def get_by_target_id(cls, component, target_id) -> list[ImageUrlResponse]:
+    async def get_by_target_id(cls, component: str, target_id: int) -> list["Image"]:
         return await cls.filter(component=component, target_id=target_id).order_by("created_at").all()
 
     @classmethod

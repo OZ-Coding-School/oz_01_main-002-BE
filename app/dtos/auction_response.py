@@ -1,7 +1,6 @@
 from datetime import datetime
 from typing import Optional
 
-import pytz
 from pydantic import BaseModel
 
 
