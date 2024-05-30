@@ -7,7 +7,7 @@ from app.models.categories import Category
 from app.models.products import Product
 from app.models.users import User
 from app.models.winners import Winner
-from app.services.image_service import service_save_image
+from app.services.image_service import service_get_images, service_save_image
 
 
 async def service_get_all_products() -> list[ProductGetResponse]:
@@ -121,6 +121,9 @@ async def service_get_products_by_user_id(current_user: int) -> list[ProductGetR
     for product in products:
         category = await Category.get(id=product.category_id)
         winner = await Winner.get_by_winner(product.id)
+        image = await service_get_images("product", product.id)
+        if image is None:
+            raise HTTPException(status_code=404, detail="image not found")
         if winner:
             user = await User.get(id=winner.user_id)
             winner_details = {
@@ -145,6 +148,7 @@ async def service_get_products_by_user_id(current_user: int) -> list[ProductGetR
             grade=product.grade,
             category=category.name,
             is_approved=product.is_approved,
+            image=image[0],
             **winner_details
         )
         products_response.append(product_response)

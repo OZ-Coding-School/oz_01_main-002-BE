@@ -38,6 +38,7 @@ class ProductGetResponse(BaseModel):
     grade: str
     category: str
     is_approved: bool
+    image: UploadFile
     winner_user_id: int | None
     winner_nickname: str | None
     winner_bid_price: float | None
