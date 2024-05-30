@@ -2,9 +2,7 @@ from tortoise import fields
 from tortoise.models import Model
 
 from app.dtos.image_response import (
-    ImageComponentResponse,
     ImageResponse,
-    ImageUrlResponse,
 )
 from app.models.common import Common
 
@@ -23,11 +21,10 @@ class Image(Model, Common):
         return await cls.filter(component=component, target_id=target_id).order_by("created_at").all()
 
     @classmethod
-    async def create_image(cls, request_data: ImageResponse) -> dict[str, str]:
+    async def create_image(cls, request_data: ImageResponse) -> None:
         await cls.create(
             component=request_data.component,
             target_id=request_data.target_id,
             description=request_data.description,
             url=request_data.url,
         )
-        return {"message": f"{request_data.component} image is save to s3"}

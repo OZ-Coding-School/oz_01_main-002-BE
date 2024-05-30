@@ -1,5 +1,3 @@
-from datetime import datetime
-
 from fastapi import APIRouter
 
 from app.dtos.auction_response import (

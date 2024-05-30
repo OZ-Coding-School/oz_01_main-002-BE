@@ -52,15 +52,19 @@ async def service_upload_image(file: UploadFile, folder: str) -> str:
         raise HTTPException(status_code=500, detail=str(e))
 
 
-async def service_save_image(file: UploadFile, request_data: ImageClassificationResponse) -> dict[str, str]:
-    url = await service_upload_image(file, request_data.component)
-    image_data = ImageResponse(
-        component=request_data.component,
-        target_id=request_data.target_id,
-        description=file.filename,
-        url=url,
-    )
-    return await Image.create_image(request_data=image_data)
+async def service_save_image(file1: UploadFile, file2: UploadFile, file3: UploadFile, request_data: ImageClassificationResponse) -> dict[str, str]:
+    files = [file1, file2, file3]
+    for file in files:
+        url = await service_upload_image(file, request_data.component)
+
+        image_data = ImageResponse(
+            component=request_data.component,
+            target_id=request_data.target_id,
+            description=file.filename,
+            url=url,
+        )
+        await Image.create_image(request_data=image_data)
+    return {"message": f"{request_data.component} image is save to s3"}
 
 
 async def service_get_images(component: str, target_id: int) -> list[ImageUrlResponse]:

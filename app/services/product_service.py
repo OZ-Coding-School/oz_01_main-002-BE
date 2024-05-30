@@ -49,7 +49,7 @@ async def service_get_all_products() -> list[ProductGetResponse]:
         raise HTTPException(status_code=404, detail="product not found")
 
 
-async def service_create_product(product_data: ProductCreate, current_user: int, file: UploadFile) -> ProductCreate:
+async def service_create_product(product_data: ProductCreate, current_user: int, file1: UploadFile, file2: UploadFile, file3: UploadFile) -> ProductCreate:
     try:
         await User.get_by_user_id(user_id=current_user)
     except DoesNotExist:
@@ -59,7 +59,7 @@ async def service_create_product(product_data: ProductCreate, current_user: int,
 
     product_image = ImageClassificationResponse(component="product", target_id=product.id)
 
-    await service_save_image(file, product_image)
+    await service_save_image(file1, file2, file3, product_image)
 
     return ProductCreate(
         name=product.name,
@@ -80,6 +80,10 @@ async def service_get_by_product_id(product_id: int) -> ProductGetResponse:
         HTTPException(status_code=404, detail="product not found")
         category = await Category.get(id=product.category_id)
         winner = await Winner.get_by_winner(product.id)
+        images = await service_get_images("product", product.id)
+        if images is None:
+            raise HTTPException(status_code=404, detail="image not found")
+        image_urls = [img.url for img in images]
         if winner:
             user = await User.get(id=winner.user_id)
             winner_details = {
@@ -104,6 +108,7 @@ async def service_get_by_product_id(product_id: int) -> ProductGetResponse:
             grade=product.grade,
             category=category.name,
             is_approved=product.is_approved,
+            images=image_urls,
             **winner_details
         )
     except DoesNotExist:
@@ -121,9 +126,10 @@ async def service_get_products_by_user_id(current_user: int) -> list[ProductGetR
     for product in products:
         category = await Category.get(id=product.category_id)
         winner = await Winner.get_by_winner(product.id)
-        image = await service_get_images("product", product.id)
-        if image is None:
+        images = await service_get_images("product", product.id)
+        if images is None:
             raise HTTPException(status_code=404, detail="image not found")
+        image_urls = [img.url for img in images]
         if winner:
             user = await User.get(id=winner.user_id)
             winner_details = {
@@ -148,7 +154,7 @@ async def service_get_products_by_user_id(current_user: int) -> list[ProductGetR
             grade=product.grade,
             category=category.name,
             is_approved=product.is_approved,
-            image=image[0],
+            images=image_urls,
             **winner_details
         )
         products_response.append(product_response)
@@ -163,6 +169,10 @@ async def service_get_products_by_category_id(category_id: int) -> list[ProductG
         if not category:
             raise HTTPException(status_code=404, detail="category not found")
         winner = await Winner.get_by_winner(product.id)
+        images = await service_get_images("product", product.id)
+        if images is None:
+            raise HTTPException(status_code=404, detail="image not found")
+        image_urls = [img.url for img in images]
         if winner:
             user = await User.get(id=winner.user_id)
             winner_details = {
@@ -187,6 +197,7 @@ async def service_get_products_by_category_id(category_id: int) -> list[ProductG
             grade=product.grade,
             category=category.name,
             is_approved=product.is_approved,
+            images=image_urls,
             **winner_details
         )
         products_out.append(product_out)
@@ -195,7 +206,7 @@ async def service_get_products_by_category_id(category_id: int) -> list[ProductG
 
 async def service_update_product(product_id: int, product_data: ProductUpdate) -> ProductUpdate:
     try:
-        product = await Product.get_by_product_id(product_id)
+        await Product.get_by_product_id(product_id)
     except DoesNotExist:
         raise HTTPException(status_code=404, detail="not found")
 

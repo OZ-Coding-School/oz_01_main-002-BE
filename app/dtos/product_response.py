@@ -1,6 +1,5 @@
 from typing import Optional
 
-from fastapi import UploadFile
 from pydantic import BaseModel
 
 
@@ -38,7 +37,7 @@ class ProductGetResponse(BaseModel):
     grade: str
     category: str
     is_approved: bool
-    image: UploadFile
+    images: list[str]
     winner_user_id: int | None
     winner_nickname: str | None
     winner_bid_price: float | None

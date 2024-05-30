@@ -1,6 +1,5 @@
-from fastapi import APIRouter, Depends, File, Form, UploadFile
+from fastapi import APIRouter, Depends, Form, UploadFile
 
-from app.dtos.image_response import ProductImageResponse
 from app.dtos.product_response import ProductCreate, ProductGetResponse, ProductUpdate
 from app.services.product_service import (
     service_create_product,
@@ -31,7 +30,9 @@ async def router_create_product(
     modify: bool = Form(...),
     grade: str = Form(...),
     category_id: int = Form(...),
-    file: UploadFile = Form(...),
+    file1: UploadFile = Form(...),
+    file2: UploadFile = Form(...),
+    file3: UploadFile = Form(...),
     current_user: int = Depends(get_current_user),
 ) -> ProductCreate:
     request_data = ProductCreate(
@@ -44,7 +45,7 @@ async def router_create_product(
         grade=grade,
         category_id=category_id,
     )
-    return await service_create_product(request_data, current_user, file)
+    return await service_create_product(request_data, current_user, file1, file2, file3)
 
 
 @router.get("/{product_id}", response_model=ProductGetResponse)
