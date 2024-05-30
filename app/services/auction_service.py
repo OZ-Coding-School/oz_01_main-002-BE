@@ -5,6 +5,7 @@ from tortoise.exceptions import DoesNotExist
 
 from app.dtos.auction_response import (
     AuctionCreate,
+    AuctionGetDetailResponse,
     AuctionGetResponse,
     AuctionResponse,
     AuctionUpdate,
@@ -69,11 +70,15 @@ async def service_get_by_auction_id(auction_id: int) -> AuctionGetResponse:
         product = await Product.get(id=auction.product_id)
         category = await Category.get(id=product.category_id)
         user = await User.get(id=product.user_id)
-        images = await service_get_images("product", auction.product_id)
-        if images is None:
+        product_images = await service_get_images("product", auction.product_id)
+        if product_images is None:
             raise HTTPException(status_code=404, detail="image not found")
-        image_urls = [img.url for img in images]
-        return AuctionGetResponse(
+        product_image_urls = [img.url for img in product_images]
+        user_images = await service_get_images("user", product.user_id)
+        if user_images is None:
+            raise HTTPException(status_code=404, detail="image not found")
+        user_image_urls = [img.url for img in user_images]
+        return AuctionGetDetailResponse(
             id=auction.id,
             product_id=auction.product_id,
             product_name=product.name,
@@ -89,7 +94,8 @@ async def service_get_by_auction_id(auction_id: int) -> AuctionGetResponse:
             final_price=auction.final_price,
             user_nickname=user.nickname,
             user_content=user.content,
-            images=image_urls,
+            product_images=product_image_urls,
+            user_image=user_image_urls[0],
         )
     raise HTTPException(status_code=404, detail="Product not found")
 
@@ -148,7 +154,7 @@ async def service_get_auctions_by_category_id(category_id: int) -> list[AuctionG
                 final_price=auction.final_price,
                 user_nickname=user.nickname,
                 user_content=user.content,
-                images=image_urls,
+                product_images=image_urls,
             )
             auctions_out.append(auction_out)
 

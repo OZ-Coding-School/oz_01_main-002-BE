@@ -1,7 +1,6 @@
 from datetime import datetime
 from typing import Optional
 
-from fastapi import UploadFile
 from pydantic import BaseModel
 
 
@@ -18,7 +17,7 @@ class AuctionResponse(BaseModel):
     start_time: Optional[datetime] = None
     end_time: Optional[datetime] = None
     charge: Optional[float] = None
-    images: list[UploadFile]
+    images: list[str]
 
 
 class AuctionGetResponse(BaseModel):
@@ -37,7 +36,11 @@ class AuctionGetResponse(BaseModel):
     product_content: str
     user_nickname: str
     user_content: str
-    images: list[UploadFile]
+    product_images: list[str]
+
+
+class AuctionGetDetailResponse(AuctionGetResponse):
+    user_image: str
 
 
 class AuctionCreate(BaseModel):
