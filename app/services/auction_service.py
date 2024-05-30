@@ -13,6 +13,7 @@ from app.models.auctions import Auction
 from app.models.categories import Category
 from app.models.products import Product
 from app.models.users import User
+from app.services.image_service import service_get_images
 
 
 async def service_create_auction(auction_data: AuctionCreate) -> AuctionCreate:
@@ -37,6 +38,10 @@ async def service_get_all_auctions() -> list[AuctionResponse]:
         for auction in auctions:
             product = await Product.get(id=auction.product_id)
             category = await Category.get(id=product.category_id)
+            images = await service_get_images("product", auction.product_id)
+            if images is None:
+                raise HTTPException(status_code=404, detail="image not found")
+            image_urls = [img.url for img in images]
             auction_response = AuctionResponse(
                 id=auction.id,
                 product_id=auction.product_id,
@@ -50,6 +55,7 @@ async def service_get_all_auctions() -> list[AuctionResponse]:
                 charge=auction.charge,
                 category=category.name,
                 final_price=auction.final_price,
+                images=image_urls,
             )
             auction_responses.append(auction_response)
         return auction_responses
@@ -63,6 +69,10 @@ async def service_get_by_auction_id(auction_id: int) -> AuctionGetResponse:
         product = await Product.get(id=auction.product_id)
         category = await Category.get(id=product.category_id)
         user = await User.get(id=product.user_id)
+        images = await service_get_images("product", auction.product_id)
+        if images is None:
+            raise HTTPException(status_code=404, detail="image not found")
+        image_urls = [img.url for img in images]
         return AuctionGetResponse(
             id=auction.id,
             product_id=auction.product_id,
@@ -79,6 +89,7 @@ async def service_get_by_auction_id(auction_id: int) -> AuctionGetResponse:
             final_price=auction.final_price,
             user_nickname=user.nickname,
             user_content=user.content,
+            images=image_urls,
         )
     raise HTTPException(status_code=404, detail="Product not found")
 
@@ -116,6 +127,10 @@ async def service_get_auctions_by_category_id(category_id: int) -> list[AuctionG
         if auction:
             category = await Category.get(id=product.category_id)
             user = await User.get(id=product.user_id)
+            images = await service_get_images("product", auction.product_id)
+            if images is None:
+                raise HTTPException(status_code=404, detail="image not found")
+            image_urls = [img.url for img in images]
 
             auction_out = AuctionGetResponse(
                 id=auction.id,
@@ -133,6 +148,7 @@ async def service_get_auctions_by_category_id(category_id: int) -> list[AuctionG
                 final_price=auction.final_price,
                 user_nickname=user.nickname,
                 user_content=user.content,
+                images=image_urls,
             )
             auctions_out.append(auction_out)
 

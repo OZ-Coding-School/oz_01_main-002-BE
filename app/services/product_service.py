@@ -17,6 +17,10 @@ async def service_get_all_products() -> list[ProductGetResponse]:
         for product in products:
             category = await Category.get(id=product.category_id)
             winner = await Winner.get_by_winner(product.id)
+            images = await service_get_images("product", product.id)
+            if images is None:
+                raise HTTPException(status_code=404, detail="image not found")
+            image_urls = [img.url for img in images]
             if winner:
                 user = await User.get(id=winner.user_id)
                 winner_details = {
@@ -41,6 +45,7 @@ async def service_get_all_products() -> list[ProductGetResponse]:
                 grade=product.grade,
                 category=category.name,
                 is_approved=product.is_approved,
+                images=image_urls,
                 **winner_details
             )
             products_out.append(product_out)
@@ -228,5 +233,10 @@ async def service_delete_product(product_id: int) -> None:
         product = await Product.get_by_product_id(product_id)
     except DoesNotExist:
         raise HTTPException(status_code=404, detail="not found")
+
+    images = await service_get_images("product", product.id)
+
+    for image in images:
+        await image.delete()
 
     await product.delete()
