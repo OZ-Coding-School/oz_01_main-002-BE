@@ -1,7 +1,7 @@
 from datetime import datetime
 from typing import Optional
-from fastapi import UploadFile
 
+from fastapi import UploadFile
 from pydantic import BaseModel
 
 
