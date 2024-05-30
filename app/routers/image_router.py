@@ -12,7 +12,7 @@ router = APIRouter(prefix="/api/v1/image", tags=["image"], redirect_slashes=Fals
 
 @router.post("/upload")
 async def save_image(
-    component: str = Form(...), target_id: int = Form(...), description: str = Form(...), file: UploadFile = File(...)
+    component: str = Form(...), target_id: int = Form(...), file: UploadFile = File(...)
 ) -> dict[str, str]:
     request_data = ImageClassificationResponse(component=component, target_id=target_id, description=description)
     return await service_save_image(file, request_data)

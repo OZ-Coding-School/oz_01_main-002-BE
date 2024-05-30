@@ -4,10 +4,10 @@ from pydantic import BaseModel
 class ImageClassificationResponse(BaseModel):
     component: str
     target_id: int
-    description: str
 
 
 class ImageResponse(ImageClassificationResponse):
+    description: str
     url: str
 
 
@@ -18,3 +18,7 @@ class ImageComponentResponse(BaseModel):
 
 class ImageUrlResponse(BaseModel):
     url: str
+
+
+class ProductImageResponse(BaseModel):
+    description: str

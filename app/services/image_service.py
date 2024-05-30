@@ -57,7 +57,7 @@ async def service_save_image(file: UploadFile, request_data: ImageClassification
     image_data = ImageResponse(
         component=request_data.component,
         target_id=request_data.target_id,
-        description=request_data.description,
+        description=file.filename,
         url=url,
     )
     return await Image.create_image(request_data=image_data)

@@ -1,11 +1,13 @@
-from fastapi import HTTPException
+from fastapi import HTTPException, UploadFile
 from tortoise.exceptions import DoesNotExist
 
 from app.dtos.product_response import ProductCreate, ProductGetResponse, ProductUpdate
+from app.dtos.image_response import ImageClassificationResponse
 from app.models.categories import Category
 from app.models.products import Product
 from app.models.users import User
 from app.models.winners import Winner
+from app.services.image_service import service_save_image
 
 
 async def service_get_all_products() -> list[ProductGetResponse]:
@@ -47,13 +49,18 @@ async def service_get_all_products() -> list[ProductGetResponse]:
         raise HTTPException(status_code=404, detail="product not found")
 
 
-async def service_create_product(product_data: ProductCreate, current_user: int) -> ProductCreate:
+async def service_create_product(product_data: ProductCreate, current_user: int, file: UploadFile) -> ProductCreate:
     try:
         await User.get_by_user_id(user_id=current_user)
     except DoesNotExist:
         raise HTTPException(status_code=404, detail="user_id not found")
 
     product = await Product.create_by_product(product_data, current_user)
+
+    product_image = ImageClassificationResponse(component="product", target_id=product.id)
+
+    await service_save_image(file, product_image)
+
     return ProductCreate(
         name=product.name,
         content=product.content,
