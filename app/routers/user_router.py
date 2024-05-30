@@ -36,7 +36,7 @@ async def send_verification_code(request_data: SendVerificationCodeResponse) -> 
 
 
 @router.post("/email/verify")
-async def verify_verification_code(request_data: VerifyEmailResponse) -> None:
+async def verify_verification_code(request_data: VerifyEmailResponse) -> dict[str, str]:
     return await service_code_authentication(request_data)
 
 
@@ -56,9 +56,8 @@ async def contact_verification(request_data: VerifyContactResponse) -> dict[str,
 
 
 @router.post("/login")
-async def login_response(request_data: UserLoginResponse, response: Response) -> dict[str, str]:
-    result, refresh_token = await service_login(request_data)
-    response.set_cookie(key="refresh_token", value=refresh_token)
+async def login_response(request_data: UserLoginResponse) -> dict[str, str]:
+    result = await service_login(request_data)
 
     return result
 

@@ -118,7 +118,7 @@ async def send_verification_email(request_data: SendVerificationCodeResponse) ->
         return {"error": str(e)}
 
 
-async def service_code_authentication(request_data: VerifyEmailResponse) -> None:
+async def service_code_authentication(request_data: VerifyEmailResponse) -> dict[str, str]:
     try:
         email = await redis.get(request_data.email)
         if email is None:
@@ -127,6 +127,7 @@ async def service_code_authentication(request_data: VerifyEmailResponse) -> None
         elif request_data.email == orjson.loads(email)["email"]:
             if str(request_data.code) == orjson.loads(await redis.get(request_data.email))["code"]:
                 await redis.delete(request_data.email)
+                return {"message": "Clear"}
         raise HTTPException(status_code=400, detail="Bad Request - Incorrect Code")
 
     except DoesNotExist:
@@ -213,7 +214,7 @@ def create_refresh_token(data: Mapping[str, str | float], expires_delta: timedel
 
 async def service_login(
     request_data: UserLoginResponse,
-) -> tuple[dict[str, str], str]:
+) -> dict[str, str]:
     try:
         user = await User.verify_user(request_data.email, request_data.password)
         if not user:
@@ -240,7 +241,7 @@ async def service_login(
     await redis.set(f"user:{user_data.id}", refresh_token)
     await redis.expire(f"user:{user_data.id}", timedelta(days=1))
 
-    return {"user": str(user_data.id), "access_token": access_token}, refresh_token
+    return {"user": str(user_data.id), "access_token": access_token, "refresh_token": refresh_token}
 
 
 async def service_token_refresh(current_refresh: str) -> dict[str, str]:
