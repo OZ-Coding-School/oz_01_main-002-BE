@@ -9,7 +9,7 @@ from email.mime.text import MIMEText
 from typing import Any
 
 import orjson
-from fastapi import Depends, HTTPException
+from fastapi import Depends, HTTPException, UploadFile
 from fastapi.security import OAuth2PasswordBearer
 from jose import JWTError, jwt  # type: ignore
 from tortoise.exceptions import DoesNotExist, IntegrityError, ValidationError
@@ -29,8 +29,9 @@ from app.dtos.user_response import (
     VerifyNicknameResponse,
 )
 from app.models.address import Address
+from app.models.images import Image
 from app.models.users import User
-from app.services.image_service import service_get_images
+from app.services.image_service import service_get_images, service_upload_image
 from app.services.term_agreement_service import service_create_terms_agreement
 from app.utils.redis_ import redis
 
@@ -322,12 +323,20 @@ async def service_get_user_detail(current_user: int) -> UserGetProfileResponse:
 
 
 async def service_update_user_detail(
-    request_data: UserUpdateProfileResponse, current_user: int
+    request_data: UserUpdateProfileResponse, file: UploadFile | None, current_user: int
 ) -> UserUpdateProfileResponse:
 
     try:
         # 사용자 업데이트
         user = await User.update_by_user(request_data, current_user)
+
+        if file is not None:
+            image = await Image.get(componant="user", target_id=user.id)
+            image_url = await service_upload_image(file, "user")
+
+            setattr(image, "url", image_url)
+
+            await image.save()
 
         return UserUpdateProfileResponse(
             nickname=user.nickname,
