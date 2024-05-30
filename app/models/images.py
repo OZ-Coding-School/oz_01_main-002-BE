@@ -1,9 +1,7 @@
 from tortoise import fields
 from tortoise.models import Model
 
-from app.dtos.image_response import (
-    ImageResponse,
-)
+from app.dtos.image_response import ImageResponse
 from app.models.common import Common
 
 

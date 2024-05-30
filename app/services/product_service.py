@@ -49,7 +49,9 @@ async def service_get_all_products() -> list[ProductGetResponse]:
         raise HTTPException(status_code=404, detail="product not found")
 
 
-async def service_create_product(product_data: ProductCreate, current_user: int, file1: UploadFile, file2: UploadFile, file3: UploadFile) -> ProductCreate:
+async def service_create_product(
+    product_data: ProductCreate, current_user: int, file1: UploadFile, file2: UploadFile, file3: UploadFile
+) -> ProductCreate:
     try:
         await User.get_by_user_id(user_id=current_user)
     except DoesNotExist:
