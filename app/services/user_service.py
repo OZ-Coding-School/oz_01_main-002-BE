@@ -371,11 +371,17 @@ async def service_update_user_image(file: UploadFile, current_user: int) -> dict
         try:
             image = await Image.get(componant="user", target_id=current_user)
 
-            setattr(image, "url", image_url)
+            await image.delete()
 
-            await image.save()
+            image_data = ImageResponse(
+                component="user",
+                target_id=current_user,
+                description=file.filename,
+                url=image_url,
+            )
+            await Image.create_image(request_data=image_data)
 
-            return {"message": f"{image.component} image is save to s3"}
+            return {"message": "'user' image is save to s3"}
 
         except DoesNotExist:
             item_data = ImageResponse(
