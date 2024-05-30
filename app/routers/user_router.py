@@ -41,17 +41,17 @@ async def verify_verification_code(request_data: VerifyEmailResponse) -> None:
 
 
 @router.post("/nickname/verify")
-async def verify_nickname(request_data: VerifyNicknameResponse) -> None:
+async def verify_nickname(request_data: VerifyNicknameResponse) -> dict[str, str]:
     return await service_nickname_verification(request_data)
 
 
 @router.post("/")
-async def signup(request_data: UserSignUpResponse, term_data: list[TermIDResponse]) -> None:
+async def signup(request_data: UserSignUpResponse, term_data: list[TermIDResponse]) -> dict[str, str]:
     return await service_signup(request_data, term_data)
 
 
 @router.post("/contact/verify")
-async def contact_verification(request_data: VerifyContactResponse) -> None:
+async def contact_verification(request_data: VerifyContactResponse) -> dict[str, str]:
     return await service_contact_verification(request_data)
 
 

@@ -127,28 +127,28 @@ async def service_code_authentication(request_data: VerifyEmailResponse) -> None
         elif request_data.email == orjson.loads(email)["email"]:
             if str(request_data.code) == orjson.loads(await redis.get(request_data.email))["code"]:
                 await redis.delete(request_data.email)
-                raise HTTPException(status_code=200, detail="OK")
         raise HTTPException(status_code=400, detail="Bad Request - Incorrect Code")
 
     except DoesNotExist:
         raise HTTPException(status_code=400, detail="Bad Request - Check user email as the authentication email ")
 
 
-async def service_nickname_verification(request_data: VerifyNicknameResponse) -> None:
+async def service_nickname_verification(request_data: VerifyNicknameResponse) -> dict[str, str]:
+    if request_data.nickname.isdigit():
+        raise HTTPException(status_code=400, detail="Bad Request - Nickname must string")
+
     try:
-        if request_data.nickname.isdigit():
-            raise HTTPException(status_code=400, detail="Bad Request - Nickname must string")
-
         user = await User.get_by_user_nickname(nickname=request_data.nickname)
-
         if user.nickname == request_data.nickname:
             raise HTTPException(status_code=400, detail="Bad Request - Nickname already registered")
 
+        return {"message": "OK - Nickname available"}
+
     except DoesNotExist:
-        raise HTTPException(status_code=200, detail="OK - Nickname available")
+        return {"message": "OK - Nickname available"}
 
 
-async def service_contact_verification(request_data: VerifyContactResponse) -> None:
+async def service_contact_verification(request_data: VerifyContactResponse) -> dict[str, str]:
     try:
         if not is_valid_contact(request_data.contact):
             raise HTTPException(status_code=400, detail="Bad Request - Invalid Contact")
@@ -157,12 +157,13 @@ async def service_contact_verification(request_data: VerifyContactResponse) -> N
 
         if user.contact == request_data.contact:
             raise HTTPException(status_code=400, detail="Bad Request - Contact already registered")
+        return {"message": "OK - Contact available"}
 
     except DoesNotExist:
-        raise HTTPException(status_code=200, detail="OK - Contact available")
+        return {"message": "OK - Contact available"}
 
 
-async def service_signup(request_data: UserSignUpResponse, term_data: list[TermIDResponse]) -> None:
+async def service_signup(request_data: UserSignUpResponse, term_data: list[TermIDResponse]) -> dict[str, str]:
     try:
         await User.get(email=request_data.email)
         raise HTTPException(status_code=400, detail="Bad Request - User already registered")
@@ -182,7 +183,7 @@ async def service_signup(request_data: UserSignUpResponse, term_data: list[TermI
         for user_term_agreement in user_term_agreements:
             await service_create_terms_agreement(user_term_agreement, user.id)
 
-        raise HTTPException(status_code=201, detail="Created - successfully signup!")
+        return {"message": "Created - successfully signup!"}
 
     except IntegrityError:
         raise HTTPException(status_code=400, detail="Bad Request - User already registered")
@@ -193,8 +194,8 @@ def create_access_token(data: Mapping[str, str | float], expires_delta: timedelt
     if expires_delta:
         expire = datetime.now(timezone.utc) + expires_delta
     else:
-        expire = datetime.now(timezone.utc) + timedelta(days=1)
-    # to_encode.update({"exp": expire.timestamp()})
+        expire = datetime.now(timezone.utc) + timedelta(minutes=5)
+    to_encode.update({"exp": expire.timestamp()})
     access_token = jwt.encode(to_encode, settings.SECRET_KEY, algorithm=settings.ALGORITHM)
     return access_token
 
