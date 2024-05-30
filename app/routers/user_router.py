@@ -81,8 +81,10 @@ async def router_get_user_detail(current_user: int = Depends(get_current_user)) 
 
 @router.put("/")
 async def router_update_user_detail(
-    request_data: UserUpdateProfileResponse,
+    nickname: Optional[str] = None,
+    contact: Optional[str] = None,
+    content: Optional[str] = None,
     file: Optional[UploadFile] = File(None),
     current_user: int = Depends(get_current_user),
 ) -> UserUpdateProfileResponse:
-    return await service_update_user_detail(request_data, file, current_user)
+    return await service_update_user_detail(file, current_user, nickname, contact, content)

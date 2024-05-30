@@ -50,7 +50,7 @@ class UserGetProfileResponse(BaseModel):
     age: int
     contact: str
     nickname: str
-    images: list[UploadFile] | None
+    images: str | None
 
 
 class UserUpdateProfileResponse(BaseModel):

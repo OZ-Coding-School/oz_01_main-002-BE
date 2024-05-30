@@ -6,7 +6,7 @@ from collections.abc import Mapping
 from datetime import datetime, timedelta, timezone
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
-from typing import Any
+from typing import Any, Optional
 
 import orjson
 from fastapi import Depends, HTTPException, UploadFile
@@ -304,7 +304,20 @@ async def service_get_user_detail(current_user: int) -> UserGetProfileResponse:
     main_address = await Address.get_main_address_by_user_id(current_user)
     images = await service_get_images("product", user.id)
     if len(images) == 0:
-        image_urls = None
+        return UserGetProfileResponse(
+            email=user.email,
+            name=user.name,
+            nickname=user.nickname,
+            contact=user.contact,
+            coin=user.coin,
+            created_at=user.created_at,
+            updated_at=user.updated_at,
+            gender=user.gender,
+            age=user.age,
+            content=user.content,
+            address=f"{main_address.address} {main_address.detail_address}" if main_address else "",
+            images=None,
+        )
     else:
         image_urls = [img.url for img in images]
     return UserGetProfileResponse(
@@ -324,12 +337,18 @@ async def service_get_user_detail(current_user: int) -> UserGetProfileResponse:
 
 
 async def service_update_user_detail(
-    request_data: UserUpdateProfileResponse, file: UploadFile | None, current_user: int
+    file: UploadFile | None,
+    current_user: int,
+    nickname: Optional[str] = None,
+    contact: Optional[str] = None,
+    content: Optional[str] = None,
 ) -> UserUpdateProfileResponse:
 
     try:
         # 사용자 업데이트
-        user = await User.update_by_user(request_data, current_user)
+        user = await User.update_by_user(
+            UserUpdateProfileResponse(nickname=nickname, contact=contact, content=content), current_user
+        )
 
         if file is not None:
             image = await Image.get(componant="user", target_id=user.id)
