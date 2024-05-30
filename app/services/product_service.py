@@ -4,6 +4,7 @@ from tortoise.exceptions import DoesNotExist
 from app.dtos.image_response import ImageClassificationResponse
 from app.dtos.product_response import ProductCreate, ProductGetResponse, ProductUpdate
 from app.models.categories import Category
+from app.models.images import Image
 from app.models.products import Product
 from app.models.users import User
 from app.models.winners import Winner
@@ -236,7 +237,9 @@ async def service_delete_product(product_id: int) -> None:
 
     images = await service_get_images("product", product.id)
 
-    for image in images:
+    image_urls = [img.url for img in images]
+    for url in image_urls:
+        image = await Image.get(url=url)
         await image.delete()
 
     await product.delete()
