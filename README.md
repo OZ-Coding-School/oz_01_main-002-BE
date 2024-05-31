@@ -3,11 +3,10 @@
 
 ## 🤖 프로젝트 소개
 
-AI 매일 3분 영어 서비스, `3-ENG`에 오신 걸 환영합니다!
->AI 매일 3분 영어 서비스는 바쁜 일상 속에서도 매일 3분만 투자하여 영어 실력을 향상시킬 수 있는 서비스입니다.
-이를 통해 사용자들은 효율적으로 영어 학습을 할 수 있으며, 짧은 시간에도 지속적인 학습이 가능합니다.
-또한, 일상에서 자연스럽게 영어 실력을 향상시킬 수 있어 실용적입니다.
-AI 기술을 활용하여 사용자 맞춤형 학습 경험을 제공합니다.
+명품관 경매 사이트
+>명품관 서비스는 비싼 물건을 경매로 실시간 채팅을 통해 경매가 이루어지는 사이트
+입니다. 실시간 채팅을 통해 더욱 재미난 요소를 추가하여 사용자에게 재미요소를 넣어
+만든 사이트 입니다.
 ---
 ## :link: 배포 링크
 
@@ -18,7 +17,7 @@ AI 기술을 활용하여 사용자 맞춤형 학습 경험을 제공합니다.
 
 > ### 🗓️ 2024.04-.01 - 2024.04.25
 > ### [📺 발표 영상]()
-> ### [📑 발표 문서]()
+> ### [📑 발표 문서](https://gamma.app/docs/-imu8byb5scc36e3?mode=doc)
 
 ---
 
@@ -40,10 +39,6 @@ AI 기술을 활용하여 사용자 맞춤형 학습 경험을 제공합니다.
 
 
 ## 🧰 사용 스택
-
-### :wrench: System Architecture
-
-<img src="https://github.com/OZ-Coding-School/oz_01_collabo-003/assets/94848819/d2e1cee8-8008-4a29-a76a-cdf22a23d54b"/>
 
 ### FE
 <div align=center>
@@ -95,7 +90,7 @@ AI 기술을 활용하여 사용자 맞춤형 학습 경험을 제공합니다.
   
   ### FE
   
-  | <a href=https://github.com/alsendrha><img src="https://avatars.githubusercontent.com/u/95726561?v=4" width=100px/><br/><sub><b>@alsendrha</b></sub></a><br/> | <a href=https://github.com/hayeon010904><img src="https://avatars.githubusercontent.com/u/153696152?v=4" width=100px/><br/><sub><b>@hayeon010904</b></sub></a><br/> |
+  | <a href=https://github.com/alsendrha><img src="https://avatars.githubusercontent.com/u/95726561?v=4" width=100px/><br/><sub><b>@alsendrha</b></sub></a><br/> | <a href=https://github.com/hyerin1228><img src="https://avatars.githubusercontent.com/u/84621142?v=4" width=100px/><br/><sub><b>@hayeon010904</b></sub></a><br/> |
   |:-----------------------------------------------------------------------------------:|:------------------------------------------------------------------------------------------:|
   |                                          김민영                     |                         황혜린                                           |
   
@@ -159,8 +154,8 @@ AI 기술을 활용하여 사용자 맞춤형 학습 경험을 제공합니다.
 > 
 > [📜 요구사항 정의서](https://docs.google.com/spreadsheets/d/1zDFlRZdJOFyQNddJfzPwFNyTIPWsx9-CRYmbmRZPs3w/edit#gid=937853649)
 > 
-> [📜 ERD]()
+> [📜 ERD](https://drive.google.com/file/d/1DRMPGcVfW6VyGsXBmrauFUebF_d-s1yt/view?usp=sharing)
 > 
-> [📜 테이블 명세서]()
+> [📜 테이블 명세서](https://docs.google.com/spreadsheets/d/1JcnINvxXuXnjT6HFGAu8tia3Tm5IxAgTxWnp7cbUTrs/edit#gid=0)
 >
-> [📜 화면 정의서]()
+> [📜 화면 정의서](https://docs.google.com/document/d/1F-V30OVciDeomDSfOuoKxwd-eWjeddXGXfV2WpfahKk/edit)
