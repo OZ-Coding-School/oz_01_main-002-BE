@@ -16,7 +16,7 @@
 ## 🗣️ 프로젝트 발표 영상 & 발표 문서
 
 > ### 🗓️ 2024.04-.01 - 2024.04.25
-> ### [📺 발표 영상]()
+> ### [📺 발표 영상](https://drive.google.com/file/d/1azeC7Qnhg94tMq4DeLzpTDfV1dkNwF1u/view?usp=sharing)
 > ### [📑 발표 문서](https://gamma.app/docs/-imu8byb5scc36e3?mode=doc)
 
 ---
@@ -26,15 +26,18 @@
 ## 🖥️ 서비스 소개
 |   메인 화면  |  로그인  |   회원가입   |
 |:--------:|:------:|:--------:|
-| <img width="310" src="https://github.com/OZ-Coding-School/oz_01_collabo-003/assets/94848819/6ffec31f-1afb-4358-ae5d-762e1ae6bb2c" alt="MainPage1"> | <img width="310" src="https://github.com/OZ-Coding-School/oz_01_collabo-003/assets/94848819/b9a5302f-a0e2-49de-a307-cc0e7881c919" alt="login">  | <img width="310" src="https://github.com/OZ-Coding-School/oz_01_collabo-003/assets/94848819/1ad22452-37ff-448b-8428-8fab84b4b4e3" alt="register"> |
+| <img width="310" src="https://github.com/OZ-Coding-School/oz_01_main-002-BE/assets/94848819/14e33249-ee11-4a75-bfa9-19ff4fb50f42" alt="MainPage1"> | <img width="310" src="https://github.com/OZ-Coding-School/oz_01_main-002-BE/assets/94848819/5278cded-be20-4b6e-9411-481edcce380f" alt="login">  | <img width="310" src="https://github.com/OZ-Coding-School/oz_01_main-002-BE/assets/94848819/ed1feaef-09a1-4cf0-9032-7fce500dd32c" alt="register"> |
 
-|                                                                                                          난이도 선택                                                                                                           |                                                                                                              날짜 선택                                                                                                               |                                                                                                             퀴즈 풀기                                                                                                            |
+                        
+채팅                                                                                                           |                                                                                                              커뮤니티 게시판                                                                                                              |                                                                                                             프로필                                                  |
 |:---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------:|:--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------:|:------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------:|
-| <img width="310" src="https://github.com/OZ-Coding-School/oz_01_collabo-003/assets/94848819/f7c3914b-9c14-4864-ba09-b25ce065a204" alt="level"> | <img width="310" src="https://github.com/OZ-Coding-School/oz_01_collabo-003/assets/94848819/be798a35-334a-4fd6-91ec-26437d786448" alt="week"> | <img width="310" src="https://github.com/OZ-Coding-School/oz_01_collabo-003/assets/94848819/99f13169-6f67-42bc-908a-9a135e1ecca4" alt="quiz"> |
+| <img width="310" src="https://github.com/OZ-Coding-School/oz_01_main-002-BE/assets/94848819/a74ace0d-4e47-42cd-b9fe-5a16e6255837" alt="chat"> | <img width="310" src="https://github.com/OZ-Coding-School/oz_01_main-002-BE/assets/94848819/a705269a-24fc-48a4-b6fb-fda8c66a1b5f" alt="커뮤니티 게시판"> | <img width="310" src="https://github.com/OZ-Coding-School/oz_01_main-002-BE/assets/94848819/c831465b-ef06-497e-8403-16b1b5a2739b" alt="프로필관리"> |
 
-|                                                                                                             결과 페이지                                                                                                             |      나의 학습 공간 페이지      |      나의 정보 페이지    |
+
+
+|                                                                                                            디테일                                                                                                            |      댓글     |      경매 리스트    |
 |:-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------:|:-------:|:---------:|
-| <img width="310" src="https://github.com/OZ-Coding-School/oz_01_collabo-003/assets/94848819/bcf01d89-f83e-4efc-b621-033e4f805f95" alt="result"> | <img width="310" src="https://github.com/OZ-Coding-School/oz_01_collabo-003/assets/94848819/e809e505-d623-4b2a-8b9c-550d7f62e8bf" alt="learning"> | <img width="310" src="https://github.com/OZ-Coding-School/oz_01_collabo-003/assets/94848819/43d84303-7e27-4c00-a18b-c97db2334c97" alt="user"> |
+| <img width="310" src="https://github.com/OZ-Coding-School/oz_01_main-002-BE/assets/94848819/3af2571e-e1ef-475c-8ad7-e2edac3edff1" alt="로그인 후 디테일 페이지"> | <img width="310" src="https://github.com/OZ-Coding-School/oz_01_main-002-BE/assets/94848819/8bb64f9b-8944-4e55-9cea-c5c507cfb38c" alt="댓글씀"> | <img width="310" src="https://github.com/OZ-Coding-School/oz_01_main-002-BE/assets/94848819/96ffb1ff-4712-45e7-8638-9174a278731c" alt="경매리스트"> |
 
 
 
